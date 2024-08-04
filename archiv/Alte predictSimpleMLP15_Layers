@@ -1,0 +1,71 @@
+/* Layer 1: Gemm
+    for (int d = 0; d < 8; d++) {
+      layer_1_output[d] = layer_1_bias[d];
+    }
+    for (int d = 0; d < 8; d++) {
+      for (int i = 0; i < 784; i++) {
+        layer_1_output[d] += layer_1_weight[d][i] * layer_0_output[i];
+      }
+    }
+    */
+    /* Layer 2: BatchNormalization
+    for (int d = 0; d < 8; d++) {
+      layer_2_output[d] = layer_1_output[d] * layer_2_scale[d] + layer_2_bias[d];
+    }
+    */
+    /* Layer 3: Relu
+    for (int d = 0; d < 8; d++) {
+      layer_3_output[d] = layer_2_output[d] >= 0 ? layer_2_output[d] : 0;
+    }
+    */
+    /* Layer 4: Gemm
+    for (int d = 0; d < 16; d++) {
+      layer_4_output[d] = layer_4_bias[d];
+    }
+    for (int d = 0; d < 16; d++) {
+      for (int i = 0; i < 8; i++) {
+        layer_4_output[d] += layer_4_weight[d][i] * layer_3_output[i];
+      }
+    }
+    */
+    /* Layer 5: BatchNormalization
+    for (int d = 0; d < 16; d++) {
+      layer_5_output[d] = layer_4_output[d] * layer_5_scale[d] + layer_5_bias[d];
+    }
+    */
+    /* Layer 6: Relu
+    for (int d = 0; d < 16; d++) {
+      layer_6_output[d] = layer_5_output[d] >= 0 ? layer_5_output[d] : 0;
+    }
+    */
+    /* Layer 7: Gemm
+    for (int d = 0; d < 15; d++) {
+      layer_7_output[d] = layer_7_bias[d];
+    }
+    for (int d = 0; d < 15; d++) {
+      for (int i = 0; i < 16; i++) {
+        layer_7_output[d] += layer_7_weight[d][i] * layer_6_output[i];
+      }
+    }
+    */
+    /* Layer 8: LogSoftmax
+    {
+      double max = 0;
+      for (int d = 0; d < 15; d++) {
+        max = layer_7_output[d] >= max ? layer_7_output[d] : max;
+      }
+      double sum = 0;
+      for (int d = 0; d < 15; d++) {
+        layer_8_output[d] = std::exp(layer_7_output[d] - max);
+        sum += layer_8_output[d];
+      }
+      for (int d = 0; d < 15; d++) {
+        layer_8_output[d] = std::log(layer_8_output[d] / sum);
+      }
+    }
+
+
+    for (int i = 0; i < 15; i++) {
+        pred[i] += layer_8_output[i];
+    }
+    */

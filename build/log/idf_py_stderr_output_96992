@@ -1,0 +1,25 @@
+[0;33m--- WARNING: GDB cannot open serial ports accessed as COMx[0m
+[0;33m--- Using \\.\COM6 instead...[0m
+[0;33m--- esp-idf-monitor 1.4.0 on \\.\COM6 115200 ---[0m
+[0;33m--- Quit: Ctrl+] | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H ---[0m
+[0;33m0x400559e3: _xtos_set_intlevel in ROM
+[0m
+[0;33m0x4201267f: task_wdt_timeout_handling at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/esp_system/task_wdt/task_wdt.c:441
+0x42012a9c: task_wdt_isr at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/esp_system/task_wdt/task_wdt.c:515
+0x4037717d: _xt_lowint1 at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/xtensa/xtensa_vectors.S:1240
+0x4200a5b7: FAST_INFERENCE::predict_SmallCnnAction(double const*, double*) at C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/main/model.cpp:106
+0x4200934b: benchmark(void*) at C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/main/main.cpp:106
+0x4037aa51: vPortTaskWrapper at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/port.c:134
+[0m
+[0;33mTo exit from IDF monitor please use "Ctrl+]". Alternatively, you can use Ctrl+T Ctrl+X to exit.[0m
+[0;33mTo exit from IDF monitor please use "Ctrl+]". Alternatively, you can use Ctrl+T Ctrl+X to exit.[0m
+[0m
+Traceback (most recent call last):
+  File "C:\Users\kbutz\esp\v5.2.1\esp-idf\tools/idf_monitor.py", line 11, in <module>
+    sys.exit(subprocess.run([sys.executable, '-m', 'esp_idf_monitor'] + sys.argv[1:]).returncode)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "subprocess.py", line 550, in run
+  File "subprocess.py", line 1199, in communicate
+  File "subprocess.py", line 1262, in wait
+  File "subprocess.py", line 1543, in _wait
+KeyboardInterrupt

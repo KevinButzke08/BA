@@ -1,0 +1,54 @@
+[0;33m--- WARNING: GDB cannot open serial ports accessed as COMx[0m
+[0;33m--- Using \\.\COM6 instead...[0m
+[0;33m--- esp-idf-monitor 1.4.0 on \\.\COM6 115200 ---[0m
+[0;33m--- Quit: Ctrl+] | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H ---[0m
+[0;33m0x4037efbf: get_spi_dev at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/hal/spi_flash_hal_common.inc:27
+ (inlined by) spi_flash_hal_poll_cmd_done at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/hal/spi_flash_hal_common.inc:38
+[0m
+[0;33m0x403758f2: panic_abort at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/esp_system/panic.c:472
+0x4037a1ad: esp_system_abort at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/esp_system/port/esp_system_chip.c:93
+0x40380515: __assert_func at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/newlib/assert.c:81
+0x4037c96a: xTaskPriorityDisinherit at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/freertos/FreeRTOS-Kernel/tasks.c:5073 (discriminator 1)
+0x4037a1d3: prvCopyDataToQueue at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/freertos/FreeRTOS-Kernel/queue.c:2469
+0x4037a615: xQueueGenericSend at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/freertos/FreeRTOS-Kernel/queue.c:964
+0x4200a3f5: FAST_INFERENCE::GemmTask(void*) at C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/main/model.cpp:95
+0x4037aa51: vPortTaskWrapper at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/port.c:134
+[0m
+[0;33m0x40375868: esp_restart_noos at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/esp_system/port/soc/esp32s3/system_internal.c:159
+[0m
+[0;33m0x403758f2: panic_abort at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/esp_system/panic.c:472
+0x4037a1ad: esp_system_abort at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/esp_system/port/esp_system_chip.c:93
+0x40380515: __assert_func at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/newlib/assert.c:81
+0x4037c96a: xTaskPriorityDisinherit at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/freertos/FreeRTOS-Kernel/tasks.c:5073 (discriminator 1)
+0x4037a1d3: prvCopyDataToQueue at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/freertos/FreeRTOS-Kernel/queue.c:2469
+0x4037a615: xQueueGenericSend at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/freertos/FreeRTOS-Kernel/queue.c:964
+0x4200a3f5: FAST_INFERENCE::GemmTask(void*) at C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/main/model.cpp:95
+0x4037aa51: vPortTaskWrapper at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/port.c:134
+[0m
+[0;33m0x40375868: esp_restart_noos at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/esp_system/port/soc/esp32s3/system_internal.c:159
+[0m
+[0;33m0x403758f2: panic_abort at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/esp_system/panic.c:472
+0x4037a1ad: esp_system_abort at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/esp_system/port/esp_system_chip.c:93
+0x40380515: __assert_func at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/newlib/assert.c:81
+0x4037c96a: xTaskPriorityDisinherit at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/freertos/FreeRTOS-Kernel/tasks.c:5073 (discriminator 1)
+0x4037a1d3: prvCopyDataToQueue at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/freertos/FreeRTOS-Kernel/queue.c:2469
+0x4037a615: xQueueGenericSend at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/freertos/FreeRTOS-Kernel/queue.c:964
+0x4200a3f5: FAST_INFERENCE::GemmTask(void*) at C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/main/model.cpp:95
+0x4037aa51: vPortTaskWrapper at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/port.c:134
+[0m
+[0;33m0x40375868: esp_restart_noos at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/esp_system/port/soc/esp32s3/system_internal.c:159
+[0m
+[0;33mTo exit from IDF monitor please use "Ctrl+]". Alternatively, you can use Ctrl+T Ctrl+X to exit.[0m
+[0;33m0x40375868: esp_restart_noos at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/esp_system/port/soc/esp32s3/system_internal.c:159
+[0m
+[0;33mTo exit from IDF monitor please use "Ctrl+]". Alternatively, you can use Ctrl+T Ctrl+X to exit.[0m
+[0m
+Traceback (most recent call last):
+  File "C:\Users\kbutz\esp\v5.2.1\esp-idf\tools/idf_monitor.py", line 11, in <module>
+    sys.exit(subprocess.run([sys.executable, '-m', 'esp_idf_monitor'] + sys.argv[1:]).returncode)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "subprocess.py", line 550, in run
+  File "subprocess.py", line 1199, in communicate
+  File "subprocess.py", line 1262, in wait
+  File "subprocess.py", line 1543, in _wait
+KeyboardInterrupt

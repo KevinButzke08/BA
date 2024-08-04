@@ -1,0 +1,68 @@
+[1/9] cmd.exe /C "cd /D C:\Users\kbutz\RTOS_ESP\main\sample\sample_project\build\esp-idf\main && C:\Espressif\python_env\idf5.2_py3.11_env\Scripts\python.exe C:/Users/kbutz/esp/v5.2.1/esp-idf/components/spiffs/spiffsgen.py 0x100000 C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/partition C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/build/storage.bin --page-size=256 --obj-name-len=32 --meta-len=4 --use-magic --use-magic-len"
+[2/9] Performing build step for 'bootloader'
+[1/1] cmd.exe /C "cd /D C:\Users\kbutz\RTOS_ESP\main\sample\sample_project\build\bootloader\esp-idf\esptool_py && C:\Espressif\python_env\idf5.2_py3.11_env\Scripts\python.exe C:/Users/kbutz/esp/v5.2.1/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x0 C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/build/bootloader/bootloader.bin"
+Bootloader binary size 0x5230 bytes. 0x2dd0 bytes (36%) free.
+[3/7] Generating ld/sections.ld
+[4/7] Linking CXX executable main.elf
+[5/7] Generating binary image from built executable
+esptool.py v4.7.0
+Creating esp32s3 image...
+Merged 2 ELF sections
+Successfully created esp32s3 image.
+Generated C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/build/main.bin
+[6/7] cmd.exe /C "cd /D C:\Users\kbutz\RTOS_ESP\main\sample\sample_project\build\esp-idf\esptool_py && C:\Espressif\python_env\idf5.2_py3.11_env\Scripts\python.exe C:/Users/kbutz/esp/v5.2.1/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 partition --type app C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/build/partition_table/partition-table.bin C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/build/main.bin"
+main.bin binary size 0x8c350 bytes. Smallest app partition is 0x100000 bytes. 0x73cb0 bytes (45%) free.
+[6/7] cmd.exe /C "cd /D C:\Users\kbutz\esp\v5.2.1\esp-idf\components\esptool_py && C:\Espressif\tools\cmake\3.24.0\bin\cmake.exe -D IDF_PATH=C:/Users/kbutz/esp/v5.2.1/esp-idf -D SERIAL_TOOL=C:/Espressif/python_env/idf5.2_py3.11_env/Scripts/python.exe;;C:/Users/kbutz/esp/v5.2.1/esp-idf/coesptool.py --chip esp32s3 -p COM6 -b 460800 --before=default_reset --after=hard_reset write_flash --flash_mode dio --flash_freq 80m --flash_size detect 0x0 bootloader/bootloader.bin 0x10000 main.bin 0x8000 partition_table/partition-table.bin 0x110000 storage.bin
+esptool.py v4.7.0
+Serial port COM6
+Connecting....
+Chip is ESP32-S3 (QFN56) (revision v0.1)
+Features: WiFi, BLE, Embedded PSRAM 8MB (AP_1v8)
+Crystal is 40MHz
+MAC: 68:b6:b3:3f:36:3c
+Uploading stub...
+Running stub...
+Stub running...
+Changing baud rate to 460800
+Changed.
+Configuring flash size...
+Auto-detected Flash size: 32MB
+Flash will be erased from 0x00000000 to 0x00005fff...
+Flash will be erased from 0x00010000 to 0x0009cfff...
+Flash will be erased from 0x00008000 to 0x00008fff...
+Flash will be erased from 0x00110000 to 0x0020ffff...
+Compressed 21040 bytes to 13037...
+Writing at 0x00000000... (100 %)
+Wrote 21040 bytes (13037 compressed) at 0x00000000 in 0.4 seconds (effective 379.1 kbit/s)...
+Hash of data verified.
+Compressed 574288 bytes to 255129...
+Writing at 0x00010000... (6 %)
+Writing at 0x00024b86... (12 %)
+Writing at 0x000348df... (18 %)
+Writing at 0x0003fd32... (25 %)
+Writing at 0x000461ae... (31 %)
+Writing at 0x0004c2e0... (37 %)
+Writing at 0x00052168... (43 %)
+Writing at 0x00059470... (50 %)
+Writing at 0x00061e1f... (56 %)
+Writing at 0x00069f30... (62 %)
+Writing at 0x00072ce9... (68 %)
+Writing at 0x000786ef... (75 %)
+Writing at 0x0008023c... (81 %)
+Writing at 0x0008a01a... (87 %)
+Writing at 0x00092051... (93 %)
+Writing at 0x00098566... (100 %)
+Wrote 574288 bytes (255129 compressed) at 0x00010000 in 6.4 seconds (effective 717.6 kbit/s)...
+Hash of data verified.
+Compressed 3072 bytes to 117...
+Writing at 0x00008000... (100 %)
+Wrote 3072 bytes (117 compressed) at 0x00008000 in 0.1 seconds (effective 225.1 kbit/s)...
+Hash of data verified.
+Compressed 1048576 bytes to 13698...
+Writing at 0x00110000... (100 %)
+Wrote 1048576 bytes (13698 compressed) at 0x00110000 in 9.2 seconds (effective 915.2 kbit/s)...
+Hash of data verified.
+
+Leaving...
+Hard resetting via RTS pin...
+mponents/esptool_py/esptool/esptool.py;--chip;esp32s3 -D SERIAL_TOOL_ARGS=--before=default_reset;--after=hard_reset;write_flash;@flash_args -D WORKING_DIRECTORY=C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/build -P C:/Users/kbutz/esp/v5.2.1/esp-idf/components/esptool_py/run_serial_tool.cmake"

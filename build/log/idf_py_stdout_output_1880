@@ -1,0 +1,29 @@
+[1/927] cmd.exe /C "cd /D C:\Users\kbutz\RTOS_ESP\main\sample\sample_project\build\esp-idf\main && C:\Espressif\tools\cmake\3.24.0\bin\cmake.exe -E echo "Failed to create SPIFFS image for partition 'storage'. " "Check project configuration if using the correct partition table file." && C:\Espressif\tools\cmake\3.24.0\bin\cmake.exe -E remove C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/build/esp-idf/main/PK62K.cmake && C:\Espressif\tools\cmake\3.24.0\bin\cmake.exe -E env "FAIL_MESSAGE=Failing the build (see errors on lines above)" C:/Espressif/tools/cmake/3.24.0/bin/cmake.exe -P C:/Users/kbutz/esp/v5.2.1/esp-idf/tools/cmake/scripts/fail.cmake"
+FAILED: esp-idf/main/CMakeFiles/spiffs_storage_bin C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/build/esp-idf/main/CMakeFiles/spiffs_storage_bin 
+cmd.exe /C "cd /D C:\Users\kbutz\RTOS_ESP\main\sample\sample_project\build\esp-idf\main && C:\Espressif\tools\cmake\3.24.0\bin\cmake.exe -E echo "Failed to create SPIFFS image for partition 'storage'. " "Check project configuration if using the correct partition table file." && C:\Espressif\tools\cmake\3.24.0\bin\cmake.exe -E remove C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/build/esp-idf/main/PK62K.cmake && C:\Espressif\tools\cmake\3.24.0\bin\cmake.exe -E env "FAIL_MESSAGE=Failing the build (see errors on lines above)" C:/Espressif/tools/cmake/3.24.0/bin/cmake.exe -P C:/Users/kbutz/esp/v5.2.1/esp-idf/tools/cmake/scripts/fail.cmake"
+Failed to create SPIFFS image for partition 'storage'.  Check project configuration if using the correct partition table file.
+CMake Error at C:/Users/kbutz/esp/v5.2.1/esp-idf/tools/cmake/scripts/fail.cmake:3 (message):
+  Failing the build (see errors on lines above)
+
+
+[2/927] cmd.exe /C "cd /D C:\Users\kbutz\RTOS_ESP\main\sample\sample_project\build\esp-idf\partition_table && C:\Espressif\tools\cmake\3.24.0\bin\cmake.exe -E echo "Partition table CSV C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/partitions.csv does not exist." && C:\Espressif\tools\cmake\3.24.0\bin\cmake.exe -E echo "Either change partition table in menuconfig or create this input file." && C:\Espressif\tools\cmake\3.24.0\bin\cmake.exe -E remove C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/build/esp-idf/partition_table/vCFpJ.cmake && C:\Espressif\tools\cmake\3.24.0\bin\cmake.exe -E env "FAIL_MESSAGE=Failing the build (see errors on lines above)" C:/Espressif/tools/cmake/3.24.0/bin/cmake.exe -P C:/Users/kbutz/esp/v5.2.1/esp-idf/tools/cmake/scripts/fail.cmake"
+FAILED: esp-idf/partition_table/CMakeFiles/partition-table C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/build/esp-idf/partition_table/CMakeFiles/partition-table 
+cmd.exe /C "cd /D C:\Users\kbutz\RTOS_ESP\main\sample\sample_project\build\esp-idf\partition_table && C:\Espressif\tools\cmake\3.24.0\bin\cmake.exe -E echo "Partition table CSV C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/partitions.csv does not exist." && C:\Espressif\tools\cmake\3.24.0\bin\cmake.exe -E echo "Either change partition table in menuconfig or create this input file." && C:\Espressif\tools\cmake\3.24.0\bin\cmake.exe -E remove C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/build/esp-idf/partition_table/vCFpJ.cmake && C:\Espressif\tools\cmake\3.24.0\bin\cmake.exe -E env "FAIL_MESSAGE=Failing the build (see errors on lines above)" C:/Espressif/tools/cmake/3.24.0/bin/cmake.exe -P C:/Users/kbutz/esp/v5.2.1/esp-idf/tools/cmake/scripts/fail.cmake"
+Partition table CSV C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/partitions.csv does not exist.
+Either change partition table in menuconfig or create this input file.
+CMake Error at C:/Users/kbutz/esp/v5.2.1/esp-idf/tools/cmake/scripts/fail.cmake:3 (message):
+  Failing the build (see errors on lines above)
+
+
+[3/927] Generating memory.ld linker script...
+[4/927] Generating ../../partition_table/partition-table.bin
+Partition table binary generated. Contents:
+*******************************************************************************
+# ESP-IDF Partition Table
+# Name, Type, SubType, Offset, Size, Flags
+nvs,data,nvs,0x9000,24K,
+phy_init,data,phy,0xf000,4K,
+factory,app,factory,0x10000,1M,
+storage,data,spiffs,0x110000,25M,
+*******************************************************************************
+ninja: build stopped: subcommand failed.

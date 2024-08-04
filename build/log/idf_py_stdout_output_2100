@@ -1,0 +1,35 @@
+[1/10] cmd.exe /C "cd /D C:\Users\kbutz\RTOS_ESP\main\sample\sample_project\build\esp-idf\main && C:\Espressif\python_env\idf5.2_py3.11_env\Scripts\python.exe C:/Users/kbutz/esp/v5.2.1/esp-idf/components/spiffs/spiffsgen.py 0x200000 C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/partition C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/build/storage.bin --page-size=1024 --obj-name-len=32 --meta-len=4 --use-magic --use-magic-len"
+FAILED: esp-idf/main/CMakeFiles/spiffs_storage_bin C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/build/esp-idf/main/CMakeFiles/spiffs_storage_bin 
+cmd.exe /C "cd /D C:\Users\kbutz\RTOS_ESP\main\sample\sample_project\build\esp-idf\main && C:\Espressif\python_env\idf5.2_py3.11_env\Scripts\python.exe C:/Users/kbutz/esp/v5.2.1/esp-idf/components/spiffs/spiffsgen.py 0x200000 C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/partition C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/build/storage.bin --page-size=1024 --obj-name-len=32 --meta-len=4 --use-magic --use-magic-len"
+Traceback (most recent call last):
+  File "C:\Users\kbutz\esp\v5.2.1\esp-idf\components\spiffs\spiffsgen.py", line 434, in create_file
+    block.update_obj(contents_chunk)
+  File "C:\Users\kbutz\esp\v5.2.1\esp-idf\components\spiffs\spiffsgen.py", line 349, in update_obj
+    raise SpiffsFullError()
+SpiffsFullError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\kbutz\esp\v5.2.1\esp-idf\components\spiffs\spiffsgen.py", line 438, in create_file
+    raise SpiffsFullError
+SpiffsFullError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\kbutz\esp\v5.2.1\esp-idf\components\spiffs\spiffsgen.py", line 593, in <module>
+    main()
+  File "C:\Users\kbutz\esp\v5.2.1\esp-idf\components\spiffs\spiffsgen.py", line 585, in main
+    spiffs.create_file('/' + os.path.relpath(full_path, args.base_dir).replace('\\', '/'), full_path)
+  File "C:\Users\kbutz\esp\v5.2.1\esp-idf\components\spiffs\spiffsgen.py", line 449, in create_file
+    block = self._create_block()
+            ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\kbutz\esp\v5.2.1\esp-idf\components\spiffs\spiffsgen.py", line 398, in _create_block
+    raise SpiffsFullError('the image size has been exceeded')
+SpiffsFullError: the image size has been exceeded
+[2/10] Performing build step for 'bootloader'
+[1/1] cmd.exe /C "cd /D C:\Users\kbutz\RTOS_ESP\main\sample\sample_project\build\bootloader\esp-idf\esptool_py && C:\Espressif\python_env\idf5.2_py3.11_env\Scripts\python.exe C:/Users/kbutz/esp/v5.2.1/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x0 C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/build/bootloader/bootloader.bin"
+Bootloader binary size 0x5230 bytes. 0x2dd0 bytes (36%) free.
+[3/8] Linking C static library esp-idf\main\libmain.a
+ninja: build stopped: subcommand failed.

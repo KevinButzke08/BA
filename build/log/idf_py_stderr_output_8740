@@ -1,0 +1,80 @@
+[0;33m--- WARNING: GDB cannot open serial ports accessed as COMx[0m
+[0;33m--- Using \\.\COM6 instead...[0m
+[0;33m--- esp-idf-monitor 1.4.0 on \\.\COM6 115200 ---[0m
+[0;33m--- Quit: Ctrl+] | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H ---[0m
+[0;33m0x4037b61f: prvSelectHighestPriorityTaskSMP at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/freertos/FreeRTOS-Kernel/tasks.c:3526
+[0m
+[0;33m0x42009333: benchmark(void*) at C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/main/main.cpp:100 (discriminator 1)
+[0m
+[0;33m0x40054bf0: __divdf3 in ROM
+0x40054c0f: __divdf3 in ROM
+[0m
+[0;33m0x42009330: std::vector<unsigned int, std::allocator<unsigned int> >::operator[](unsigned int) at C:/Espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/xtensa-esp-elf/include/c++/13.2.0/bits/stl_vector.h:1126
+ (inlined by) benchmark(void*) at C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/main/main.cpp:100
+0x4037aa55: vPortTaskWrapper at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/port.c:134
+[0m
+[0;33m0x4037586c: esp_restart_noos at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/esp_system/port/soc/esp32s3/system_internal.c:159
+[0m
+[0;33m0x42009333: benchmark(void*) at C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/main/main.cpp:100 (discriminator 1)
+[0m
+[0;33m0x40054bf0: __divdf3 in ROM
+0x40054c0f: __divdf3 in ROM
+[0m
+[0;33m0x42009330: std::vector<unsigned int, std::allocator<unsigned int> >::operator[](unsigned int) at C:/Espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/xtensa-esp-elf/include/c++/13.2.0/bits/stl_vector.h:1126
+ (inlined by) benchmark(void*) at C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/main/main.cpp:100
+0x4037aa55: vPortTaskWrapper at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/port.c:134
+[0m
+[0;33m0x4037586c: esp_restart_noos at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/esp_system/port/soc/esp32s3/system_internal.c:159
+[0m
+[0;33m0x42009333: benchmark(void*) at C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/main/main.cpp:100 (discriminator 1)
+[0m
+[0;33m0x40054bf0: __divdf3 in ROM
+0x40054c0f: __divdf3 in ROM
+[0m
+[0;33m0x42009330: std::vector<unsigned int, std::allocator<unsigned int> >::operator[](unsigned int) at C:/Espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/xtensa-esp-elf/include/c++/13.2.0/bits/stl_vector.h:1126
+ (inlined by) benchmark(void*) at C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/main/main.cpp:100
+0x4037aa55: vPortTaskWrapper at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/port.c:134
+[0m
+[0;33m0x4037586c: esp_restart_noos at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/esp_system/port/soc/esp32s3/system_internal.c:159
+[0m
+[0;33mTo exit from IDF monitor please use "Ctrl+]". Alternatively, you can use Ctrl+T Ctrl+X to exit.[0m
+[0;33mTo exit from IDF monitor please use "Ctrl+]". Alternatively, you can use Ctrl+T Ctrl+X to exit.[0m
+[0;33mWriting to serial is timing out. Please make sure that your application supports an interactive console and that you have picked the correct console for serial communication.[0m
+[0;33m0x42009333: benchmark(void*) at C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/main/main.cpp:100 (discriminator 1)
+[0m
+[0;33m0x40054bf0: __divdf3 in ROM
+0x40054c0f: __divdf3 in ROM
+[0m
+[0;33m0x42009330: std::vector<unsigned int, std::allocator<unsigned int> >::operator[](unsigned int) at C:/Espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/xtensa-esp-elf/include/c++/13.2.0/bits/stl_vector.h:1126
+ (inlined by) benchmark(void*) at C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/main/main.cpp:100
+0x4037aa55: vPortTaskWrapper at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/port.c:134
+[0m
+[0;33m0x4037586c: esp_restart_noos at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/esp_system/port/soc/esp32s3/system_internal.c:159
+[0m
+[0;33m0x42009333: benchmark(void*) at C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/main/main.cpp:100 (discriminator 1)
+[0m
+[0;33m0x40054bf0: __divdf3 in ROM
+0x40054c0f: __divdf3 in ROM
+[0m
+[0;33m0x42009330: std::vector<unsigned int, std::allocator<unsigned int> >::operator[](unsigned int) at C:/Espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/xtensa-esp-elf/include/c++/13.2.0/bits/stl_vector.h:1126
+ (inlined by) benchmark(void*) at C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/main/main.cpp:100
+0x4037aa55: vPortTaskWrapper at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/port.c:134
+[0m
+[0;33m0x4037586c: esp_restart_noos at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/esp_system/port/soc/esp32s3/system_internal.c:159
+[0m
+[0;33m0x42009333: benchmark(void*) at C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/main/main.cpp:100 (discriminator 1)
+[0m
+[0;33m0x40054bf0: __divdf3 in ROM
+0x40054c0f: __divdf3 in ROM
+[0m
+[0;33mTo exit from IDF monitor please use "Ctrl+]". Alternatively, you can use Ctrl+T Ctrl+X to exit.[0m
+[0m
+Traceback (most recent call last):
+  File "C:\Users\kbutz\esp\v5.2.1\esp-idf\tools/idf_monitor.py", line 11, in <module>
+    sys.exit(subprocess.run([sys.executable, '-m', 'esp_idf_monitor'] + sys.argv[1:]).returncode)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "subprocess.py", line 550, in run
+  File "subprocess.py", line 1199, in communicate
+  File "subprocess.py", line 1262, in wait
+  File "subprocess.py", line 1543, in _wait
+KeyboardInterrupt

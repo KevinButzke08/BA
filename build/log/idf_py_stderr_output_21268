@@ -1,0 +1,60 @@
+[0;33m--- WARNING: GDB cannot open serial ports accessed as COMx[0m
+[0;33m--- Using \\.\COM6 instead...[0m
+[0;33m--- esp-idf-monitor 1.4.0 on \\.\COM6 115200 ---[0m
+[0;33m--- Quit: Ctrl+] | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H ---[0m
+[0;33m0x4037ad6e: xPortEnterCriticalTimeout at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/port.c:487
+[0m
+[0;33m0x4200a517: FAST_INFERENCE::LogSoftmaxTask(void*) at C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/main/model.cpp:138
+[0m
+[0;33m0x4200a514: FAST_INFERENCE::LogSoftmaxTask(void*) at C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/main/model.cpp:138
+0x4037aa51: vPortTaskWrapper at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/port.c:134
+[0m
+[0;33m0x40375868: esp_restart_noos at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/esp_system/port/soc/esp32s3/system_internal.c:159
+[0m
+[0;33m0x4200a517: FAST_INFERENCE::LogSoftmaxTask(void*) at C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/main/model.cpp:138
+[0m
+[0;33m0x4200a514: FAST_INFERENCE::LogSoftmaxTask(void*) at C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/main/model.cpp:138
+0x4037aa51: vPortTaskWrapper at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/port.c:134
+[0m
+[0;33m0x40375868: esp_restart_noos at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/esp_system/port/soc/esp32s3/system_internal.c:159
+[0m
+[0;33m0x4200a517: FAST_INFERENCE::LogSoftmaxTask(void*) at C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/main/model.cpp:138
+[0m
+[0;33m0x4200a514: FAST_INFERENCE::LogSoftmaxTask(void*) at C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/main/model.cpp:138
+0x4037aa51: vPortTaskWrapper at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/port.c:134
+[0m
+[0;33m0x40375868: esp_restart_noos at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/esp_system/port/soc/esp32s3/system_internal.c:159
+[0m
+[0;33m0x4200a517: FAST_INFERENCE::LogSoftmaxTask(void*) at C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/main/model.cpp:138
+[0m
+[0;33m0x4200a514: FAST_INFERENCE::LogSoftmaxTask(void*) at C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/main/model.cpp:138
+0x4037aa51: vPortTaskWrapper at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/port.c:134
+[0m
+[0;33m0x40375868: esp_restart_noos at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/esp_system/port/soc/esp32s3/system_internal.c:159
+[0m
+[0;33m0x4200a517: FAST_INFERENCE::LogSoftmaxTask(void*) at C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/main/model.cpp:138
+[0m
+[0;33m0x4200a514: FAST_INFERENCE::LogSoftmaxTask(void*) at C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/main/model.cpp:138
+0x4037aa51: vPortTaskWrapper at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/port.c:134
+[0m
+[0;33m0x40375868: esp_restart_noos at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/esp_system/port/soc/esp32s3/system_internal.c:159
+[0m
+[0;33m0x4200a517: FAST_INFERENCE::LogSoftmaxTask(void*) at C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/main/model.cpp:138
+[0m
+[0;33m0x4200a514: FAST_INFERENCE::LogSoftmaxTask(void*) at C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/main/model.cpp:138
+0x4037aa51: vPortTaskWrapper at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/port.c:134
+[0m
+[0;33m0x40375868: esp_restart_noos at C:/Users/kbutz/esp/v5.2.1/esp-idf/components/esp_system/port/soc/esp32s3/system_internal.c:159
+[0m
+[0;33mTo exit from IDF monitor please use "Ctrl+]". Alternatively, you can use Ctrl+T Ctrl+X to exit.[0m
+[0;33mTo exit from IDF monitor please use "Ctrl+]". Alternatively, you can use Ctrl+T Ctrl+X to exit.[0m
+[0m
+Traceback (most recent call last):
+  File "C:\Users\kbutz\esp\v5.2.1\esp-idf\tools/idf_monitor.py", line 11, in <module>
+    sys.exit(subprocess.run([sys.executable, '-m', 'esp_idf_monitor'] + sys.argv[1:]).returncode)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "subprocess.py", line 550, in run
+  File "subprocess.py", line 1199, in communicate
+  File "subprocess.py", line 1262, in wait
+  File "subprocess.py", line 1543, in _wait
+KeyboardInterrupt
