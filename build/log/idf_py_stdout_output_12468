@@ -1,2 +1,0 @@
-[1/11] cmd.exe /C "cd /D C:\Users\kbutz\RTOS_ESP\main\sample\sample_project\build\esp-idf\main && C:\Espressif\python_env\idf5.2_py3.11_env\Scripts\python.exe C:/Users/kbutz/esp/v5.2.1/esp-idf/components/spiffs/spiffsgen.py 0x100000 C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/partition C:/Users/kbutz/RTOS_ESP/main/sample/sample_project/build/storage.bin --page-size=256 --obj-name-len=32 --meta-len=4 --use-magic --use-magic-len"
-[2/11] Performing build step for 'bootloader'
