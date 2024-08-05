@@ -48,16 +48,9 @@ auto read_csv(std::string &path) {
 	std::string header;
 	std::getline(file, header);
 
-	unsigned int label_pos = 0;
+	unsigned int label_pos = 784;
 	std::stringstream ss(header);
 	std::string entry;
-	while (std::getline(ss, entry, ',')) {
-		if (entry == "label") {
-			break;
-		} else {
-			label_pos++;
-		}
-	}
 	std::cout << "label_pos: " << label_pos << std::endl;
 
 	if (file.is_open()) {
