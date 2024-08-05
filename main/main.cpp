@@ -61,7 +61,7 @@ auto read_csv(std::string &path, unsigned int batchingSize, unsigned lineNumber)
 				break;
 			 }
 		}
-		for(int batchIndex = 0; batchIndex < batchingSize; batchIndex++) {
+		for(int batchIndex = 1; batchIndex < batchingSize; batchIndex++) {
 			std::getline(file, line);
 				if (line.size() > 0) {
 					std::stringstream ss(line);
@@ -93,16 +93,17 @@ void benchmark(void *params) {
 	unsigned int summedUpMatches = 0;
 	unsigned int xSize = 0;
 	float accuracy;
-	for(int testDataLine = 1; testDataLine < 5; testDataLine =+ 5) {
+	for(int testDataLine = 1; testDataLine < 10; testDataLine += 5) {
 		auto data = read_csv(path, batchSize, testDataLine);
 		std::vector<std::vector<double>> &X = std::get<0>(data);
     	std::vector<unsigned int> &Y = std::get<1>(data);
 		double * output = new double[N_CLASSES];
 		unsigned int matches = 0;
-		xSize += X.size();
+		xSize = X.size();
     	for (unsigned int k = 0; k < repeat; ++k) {
     		matches = 0;
 	    	for (unsigned int i = 0; i < X.size(); ++i) {
+				//std::cout<< i << std::endl;
 	        	std::fill(output, output+N_CLASSES, 0);
 	        	unsigned int label = Y[i];
 				double const * const x = &X[i][0];
