@@ -24,6 +24,7 @@ TaskHandle_t mainTaskHandle = NULL;
 struct TaskParams {
     unsigned int repeat;
 	unsigned int batchSize;
+	unsigned int lineNumbers;
 };
 void init_spiffs() {
     esp_vfs_spiffs_conf_t conf = {
@@ -90,17 +91,18 @@ void benchmark(void *params) {
 	TaskParams *taskParams = static_cast<TaskParams*>(params);
 	unsigned int batchSize = taskParams->batchSize;
 	unsigned int repeat = taskParams->repeat;
+	unsigned int lineNumbers = taskParams->lineNumbers;
 	unsigned int summedUpMatches = 0;
 	unsigned int xSize = 0;
 	float accuracy;
-	for(int testDataLine = 1; testDataLine < 10; testDataLine += 5) {
+	for(int testDataLine = 1; testDataLine < lineNumbers; testDataLine += batchSize) {
 		auto data = read_csv(path, batchSize, testDataLine);
 		std::vector<std::vector<double>> &X = std::get<0>(data);
     	std::vector<unsigned int> &Y = std::get<1>(data);
 		double * output = new double[N_CLASSES];
 		unsigned int matches = 0;
 		xSize = X.size();
-    	for (unsigned int k = 0; k < repeat; ++k) {
+    	for (unsigned int k = 0; k < repeat; ++k) {	
     		matches = 0;
 	    	for (unsigned int i = 0; i < X.size(); ++i) {
 				//std::cout<< i << std::endl;
@@ -128,9 +130,16 @@ void benchmark(void *params) {
 				} 
 			}
     	}
+		std::cout << matches << std::endl;
     delete[] output;
-	summedUpMatches += matches;
+	//TODO:SUMMEDUPMATCHES ONLY 3, SHOULD BE 5!
+	summedUpMatches = summedUpMatches + matches;
 	}
+	xSize++;
+	xSize = xSize*(lineNumbers/batchSize) - 1;
+	std::cout << summedUpMatches << std::endl;
+	std::cout << xSize << "X SIZE" << std::endl;
+	std::cout << static_cast<float>(summedUpMatches) / xSize;
     accuracy = static_cast<float>(summedUpMatches) / xSize * 100.f;
 	#ifdef REF_ACCURACY
 		float difference = accuracy - REF_ACCURACY;
@@ -148,12 +157,13 @@ extern "C" void app_main(void){
     init_spiffs();
     
     std::string path = std::string("/storage/testing.csv");
-    unsigned int repeat = 8;
-	unsigned int batchSize = 5;
+    unsigned int repeat = 2;
+	unsigned int batchSize = 2;
+	unsigned int lineNumbers = 10;
 	
     std::cout << "RUNNING BENCHMARK WITH " << repeat << " REPETITIONS" << std::endl;
     //auto results = benchmark(std::get<0>(data), std::get<1>(data), repeat/2);
-	TaskParams params1{repeat, batchSize};
+	TaskParams params1{repeat, batchSize, lineNumbers};
 	mainTaskHandle = xTaskGetCurrentTaskHandle();
 	auto start = std::chrono::high_resolution_clock::now();
 	xTaskCreate(benchmark, "Task1", 20000, &params1, 1, &benchmarkTaskHandle1);
