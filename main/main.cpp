@@ -37,48 +37,53 @@ void init_spiffs() {
     esp_vfs_spiffs_register(&conf);
 }
 
-auto read_csv(std::string &path, unsigned int batchingSize, unsigned lineNumber) {
+auto read_csv(std::string &path, unsigned int batchingSize, unsigned lineNumber, unsigned maxLine) {
 	std::vector<std::vector<double>> X;
 	std::vector<unsigned int> Y;
-
 	std::ifstream file(path);
 	std::string header;
 	std::getline(file, header);
 
 	//HARDCODED TO SAVE EVERYTIME ITERATING AND EVERYTIME THE SAME TESTING.CSV
 	unsigned int label_pos = 784;
-	unsigned currentLine = 1;
+	unsigned currentLine = 2;
 	std::stringstream ss(header);
 	std::string entry;
 	
 	if (file.is_open()) {
 		std::string line;
-		
-		while (std::getline(file, line)) {
+		while (currentLine <= lineNumber) {
 			if(currentLine != lineNumber) {
+				std::getline(file, line);
 				currentLine++;
 			}
 			else {
 				break;
 			 }
 		}
-		for(int batchIndex = 1; batchIndex < batchingSize; batchIndex++) {
+		for(int batchIndex = 1; batchIndex <= batchingSize; batchIndex++) {
 			std::getline(file, line);
 				if (line.size() > 0) {
-					std::stringstream ss(line);
-					entry = "";
-
-					unsigned int i = 0;
-					std::vector<double> x;
-					while (std::getline(ss, entry, ',')) {
-						if (i == label_pos) {
-						Y.push_back(static_cast<unsigned int>(std::stoi(entry)));
-						} else {
-						x.push_back(static_cast<double>(std::stof(entry)));
-						}
-					++i;
+					if(currentLine > maxLine) {
+						break;
 					}
-				X.push_back(x);
+					else {
+						std::stringstream ss(line);
+						entry = "";
+
+						unsigned int i = 0;
+						std::vector<double> x;
+						while (std::getline(ss, entry, ',')) {
+							if (i == label_pos) {
+							Y.push_back(static_cast<unsigned int>(std::stoi(entry)));
+							} else {
+							x.push_back(static_cast<double>(std::stof(entry)));
+							}
+						++i;
+						}
+					X.push_back(x);
+					currentLine++;
+					}
 				}
 		}
 		file.close();
@@ -95,17 +100,16 @@ void benchmark(void *params) {
 	unsigned int summedUpMatches = 0;
 	unsigned int xSize = 0;
 	float accuracy;
-	for(int testDataLine = 1; testDataLine < lineNumbers; testDataLine += batchSize) {
-		auto data = read_csv(path, batchSize, testDataLine);
+
+	for(int testDataLine = 2; testDataLine <= lineNumbers; testDataLine += batchSize) {
+		auto data = read_csv(path, batchSize, testDataLine, lineNumbers);
 		std::vector<std::vector<double>> &X = std::get<0>(data);
     	std::vector<unsigned int> &Y = std::get<1>(data);
 		double * output = new double[N_CLASSES];
 		unsigned int matches = 0;
-		xSize = X.size();
     	for (unsigned int k = 0; k < repeat; ++k) {	
     		matches = 0;
 	    	for (unsigned int i = 0; i < X.size(); ++i) {
-				//std::cout<< i << std::endl;
 	        	std::fill(output, output+N_CLASSES, 0);
 	        	unsigned int label = Y[i];
 				double const * const x = &X[i][0];
@@ -119,7 +123,6 @@ void benchmark(void *params) {
 							argmax = j;
 						}
 					}
-
 					if (argmax == label) {
 						++matches;
 					}
@@ -130,16 +133,12 @@ void benchmark(void *params) {
 				} 
 			}
     	}
-		std::cout << matches << std::endl;
     delete[] output;
-	//TODO:SUMMEDUPMATCHES ONLY 3, SHOULD BE 5!
 	summedUpMatches = summedUpMatches + matches;
 	}
-	xSize++;
-	xSize = xSize*(lineNumbers/batchSize) - 1;
-	std::cout << summedUpMatches << std::endl;
-	std::cout << xSize << "X SIZE" << std::endl;
-	std::cout << static_cast<float>(summedUpMatches) / xSize;
+	xSize = lineNumbers - 1;
+	std::cout << summedUpMatches << " MATCHES" << std::endl;
+	std::cout << xSize << " X SIZE" << std::endl;
     accuracy = static_cast<float>(summedUpMatches) / xSize * 100.f;
 	#ifdef REF_ACCURACY
 		float difference = accuracy - REF_ACCURACY;
@@ -157,12 +156,11 @@ extern "C" void app_main(void){
     init_spiffs();
     
     std::string path = std::string("/storage/testing.csv");
-    unsigned int repeat = 2;
-	unsigned int batchSize = 2;
-	unsigned int lineNumbers = 10;
+    unsigned int repeat = 8;
+	unsigned int batchSize = 5;
+	unsigned int lineNumbers = 25;
 	
     std::cout << "RUNNING BENCHMARK WITH " << repeat << " REPETITIONS" << std::endl;
-    //auto results = benchmark(std::get<0>(data), std::get<1>(data), repeat/2);
 	TaskParams params1{repeat, batchSize, lineNumbers};
 	mainTaskHandle = xTaskGetCurrentTaskHandle();
 	auto start = std::chrono::high_resolution_clock::now();
@@ -170,10 +168,8 @@ extern "C" void app_main(void){
 	//xTaskCreatePinnedToCore(benchmark, "Task2", 70000, &params1, 1, &benchmarkTaskHandle2, 1);
 	ulTaskNotifyTake(pdTRUE,portMAX_DELAY);
 	auto end = std::chrono::high_resolution_clock::now();
-
-    //auto runtime = static_cast<float>(std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count()) / (std::get<0>(data).size() * repeat);
-	std::cout << "TOTAL RUNTIME: " << std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count() << std::endl;
-    //std::cout << "Latency: " << runtime << " [ms/elem]" << std::endl;
-	
+    auto runtime = static_cast<float>(std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count()) / ((lineNumbers-1) * repeat);
+	std::cout << "TOTAL RUNTIME: " << std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count() << " ms" << std::endl;
+    std::cout << "Latency: " << runtime << " [ms/elem]" << std::endl;
 }
 
