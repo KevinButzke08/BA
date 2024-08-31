@@ -1,0 +1,147 @@
+-START MODEL (ONE CORE, NO RTOS TAKS)
+-BENCHED WITH 25!
+TOTAL RUNTIME:1513ms
+Accuracy: 83.3333 %
+Latency: 7.88021 [ms/elem]
+Reference Accuracy: 80.8 %
+Difference: 2.53333
+83.3333,80.8,2.53333,7.88021
+[15]:
+-START MODEL					
+RUNNING BENCHMARK WITH 8 REPETITIONS
+69224 USED STACK SIZE
+Reference Accuracy: 80.8 %
+Difference: 12.0571
+92.8571,80.8,12.0571
+TOTAL RUNTIME:874 Latency: 7.80357 [ms/elem]
+
+-ONE CORE BENCHMARK AND TASK GENERATING FOR LAYERS:
+RUNNING BENCHMARK WITH 8 REPETITIONS
+69216 USED STACK SIZE
+Reference Accuracy: 80.8 %
+Difference: 12.0571
+92.8571,80.8,12.0571
+TOTAL RUNTIME:1123 Latency: 10.0268 [ms/elem]
+SIMPLE_FEED_FORWARD_MLP:
+[17]: 
+-DUO CORE BENCHMARK AND TASK GENERATING FOR LAYERS:		-DUO CORE BENCHMARK AND TASK GENERATING FOR LAYERS#2:
+Reference Accuracy: 80.8 %					REF acc: 80.8%
+Difference: -37.05						Differnce: -5.8
+43.75,80.8,-37.05						75,80.8,-5,8
+69472 USED STACK SIZE 						69472 USED STACK SIZE
+Reference Accuracy: 80.8 %					REF acc: 80.8%
+Difference: -62-05						Difference: -5.8
+18.75,80.8,-55.8						75,80.8,-5.8
+TOTAL RUNTIME:1286 Latency: 10.0469 [ms/elem]			TOTAL RUNTIME:1436 Latency: 11.2188 [ms/elem]
+
+-ONE CORE BENCHMARK AND TASK GENERATING FOR LAYERS:
+RUNNING BENCHMARK WITH 8 REPETITIONS
+69216 USED STACK SIZE
+Reference Accuracy: 80.8 %
+Difference: 12.95
+93.75,80.8,12.95
+TOTAL RUNTIME:1285 Latency: 10.0391 [ms/elem]
+
+
+[25]:
+-START MODEL 
+RUNNING BENCHMARK WITH 8 REPETITIONS
+69484 USED STACK SIZE
+Reference Accuracy: 80.8 %
+Difference: 2.53333
+83.3333,80.8,2.53333
+TOTAL RUNTIME:1517 Latency: 7.90104 [ms/elem]
+
+-ONE CORE BENCHMARK AND TASK GENERATING FOR LAYERS:
+RUNNING BENCHMARK WITH 8 REPETITIONS
+69476 USED STACK SIZE
+Reference Accuracy: 80.8 %
+Difference: 2.53333
+83.3333,80.8,2.53333
+TOTAL RUNTIME:1921 Latency: 10.0052 [ms/elem]
+
+--> TRIED WITH REGULAR CNN, BUT SPACE OF ESP-32 TOO LIMITED; EITHER TEST CODE TOO SMALL OR HAD TO REDUCE THE WEIGHTS AND SCALES TO FAR = TOO SMALL ACCURACY
+CNN:
+[10]:
+25000 stack size
+RUNNING BENCHMARK WITH 8 REPETITIONS
+24480 USED STACK SIZE
+9 X SIZE
+5 matches
+Reference Accuracy: 70.84 %
+Difference: -15.2844
+55.5556,70.84,-15.2844
+TOTAL RUNTIME: 23013
+Latency: 319.625 [ms/elem]
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+[BATCHING OF TEST CODE]:
+[5]:
+CNN:
+3 Matches mit BATCHSIZE 5
+3 Matches ohne
+4 Size ohne
+RUNNING BENCHMARK WITH 8 REPETITIONS
+Reference Accuracy: 70.84 %
+Difference: 9.16
+80,70.84,9.16
+TOTAL RUNTIME: 12701
+COMPARE AND FIX MAIN BRANCH TO SEE IF ACCURACY IS CORRECT
+COMPARISON: (HAD TO MANUALLY FIX LABEL POS)
+RUNNING BENCHMARK WITH 8 REPETITIONS
+Reference Accuracy: 70.84 %
+Difference: 4.16
+75,70.84,4.16
+TOTAL RUNTIME: 10156
+
+[10]:
+3 Matches
+CNN WITH 5 BATCHSIZE:
+Reference Accuracy: 70.84 %
+Difference: 4.16
+75,70.84,4.16
+TOTAL RUNTIME: 20458
+--------------------------------------------------------------------------------------------------------------------
+Batchsizes are with half the Lines
+Maximum Batchsize ist 5~6
+All 8 Repetetitions
+
+[10]:
+MAIN:				BATCH: 					
+9 X SIZE			5 MATCHES
+5 matches			9 X SIZE
+Reference Accuracy: 70.84 %     Reference Accuracy: 70.84 %
+Difference: -15.2844		Difference: -15.2844
+55.5556,70.84,-15.2844		55.5556,70.84,-15.2844	
+TOTAL RUNTIME: 23013 ms		TOTAL RUNTIME: 23047 ms
+Latency: 319.625 [ms/elem]	Latency: 320.097 [ms/elem]
+
+[8]:
+MAIN:				BATCH:
+7 X SIZE			5 MATCHES
+5 matches			7 X SIZE
+Reference Accuracy: 70.84 %	Reference Accuracy: 70.84 %
+Difference: 0.588574		Difference: 0.588574
+71.4286,70.84,0.588574		71.4286,70.84,0.588574	
+TOTAL RUNTIME: 17887		TOTAL RUNTIME: 17962 ms
+Latency: 319.411 [ms/elem]	Latency: 320.75 [ms/elem]
+
+[6]:
+MAIN:				BATCH:
+5 X SIZE			3 MATCHES
+3 matches			5 X SIZE
+Reference Accuracy: 70.84 %	Reference Accuracy 70.84 %
+Difference: -10.84		Difference: -10.84
+60,70.84,-10.84			60,70.84,-10.84
+TOTAL RUNTIME: 12780		TOTAL RUNTIME: 12837 ms
+Latency: 319.5 [ms/elem]	Latency: 320.925 [ms/elem]
+-------------------------------------------------------------------------------------------------------------------
+BATCH:
+[25]:
+15 MATCHES
+24 X SIZE
+Reference Accuracy: 70.84 %
+Difference: -8.34
+62.5,70.84,-8.34
+TOTAL RUNTIME: 61664 ms
+Latency: 321.167 [ms/elem]
+ 
