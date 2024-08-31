@@ -140,7 +140,7 @@ namespace FAST_INFERENCE
     double sum = 0;
     for (int d = 0; d < dp; d++)
     {
-      layer_8_output[d] = std::exp(layer_p_previous_output[d] - max);
+      layer_p_output[d] = std::exp(layer_p_previous_output[d] - max);
       sum += layer_p_output[d];
     }
     for (int d = 0; d < dp; d++)
@@ -149,7 +149,7 @@ namespace FAST_INFERENCE
     }
     for (int i = 0; i < dp; i++)
     {
-      pred[i] += layer_8_output[i];
+      pred[i] += layer_p_output[i];
     }
     xSemaphoreGive(mutex);
     vTaskDelete(NULL);

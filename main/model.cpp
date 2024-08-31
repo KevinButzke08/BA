@@ -2,6 +2,11 @@
 #include <stdint.h>
 #include <limits>
 #include <algorithm>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/semphr.h"
+#include <string>
+#include <iostream>
 
 namespace FAST_INFERENCE {
 
@@ -33,52 +38,275 @@ static double layer_12_output[12];
 static double layer_13_output[12];
 static double layer_14_output[10];
 static double layer_15_output[10];
+static SemaphoreHandle_t mutex;
+TaskHandle_t layer2Handle, layer3Handle, layer4Handle, layer5Handle, layer6Handle, layer7Handle, layer8Handle, layer9Handle, layer11Handle, layer12Handle, layer13Handle, layer14Handle, layer15Handle;
 
-
-void predict_SmallCnnActionBINARY5(double const * const x, double * pred) {
-    auto layer_0_output = x;
-	
-    // Layer 1: Reshape
-    auto layer_1_output = (double (*)[28][1]) layer_0_output;
-
-    // Layer 2: Conv
-    for (int h = 0; h < 26; h++) {
-      for (int w = 0; w < 26; w++) {
-        for (int m = 0; m < 12; m++) {
-          layer_2_output[h][w][m] = layer_2_bias[m];
+struct MaxPoolTaskParams
+  {
+    unsigned int hp;
+    unsigned int wp;
+    unsigned int cp;
+    unsigned int kHp;
+    unsigned int kWp;
+    double *output;
+    unsigned int output_1_index;
+  };
+  struct GemmTaskParams
+  {
+    unsigned int dp;
+    unsigned int ip;
+    double* output;
+    double* output_1;
+    const double* bias;
+    const double* weight;
+  };
+  struct ConvTaskParams
+  {
+    unsigned int hp;
+    unsigned int wp;
+    unsigned int mp;
+    unsigned int kHp;
+    unsigned int kWp;
+    unsigned int cp;
+    unsigned int prev_wp;
+    double* output;
+    double* output_1;
+    const double* bias;
+    const double* weight;
+  };
+  struct BatchNormalization1DTaskParams
+  {
+    unsigned int dp;
+    double* output;
+    double* output_1;
+    const double* scale;
+    const double* bias;
+  };
+  struct BatchNormalization3DTaskParams
+  {
+    unsigned int dp;
+    unsigned int wp;
+    unsigned int cp;
+    double* output;
+    double* output_1;
+    const double* scale;
+    const double* bias;
+  };
+  struct Step1DTaskParams
+  {
+    unsigned int hp;
+    double* output;
+    double* output_1;
+  };
+  struct Step3DTaskParams
+  {
+    unsigned int hp;
+    unsigned int wp;
+    unsigned int cp;
+    double* output;
+    double* output_1;
+  };
+  struct LogSoftmaxTaskParams
+  {
+    unsigned int dp;
+    double* output;
+    double* output_1;
+    double* pred;
+    SemaphoreHandle_t mutex;
+  };
+  
+  void ConvTask(void *params) {
+    TaskHandle_t currentTaskHandle = xTaskGetCurrentTaskHandle();
+    if(currentTaskHandle == layer6Handle) {
+      ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    }
+    else {
+      //Waiting for all the other Taskhandel to load and be not NULL
+      vTaskDelay(1);
+    }
+    ConvTaskParams *taskParams = static_cast<ConvTaskParams *>(params);
+    unsigned int hp = taskParams->hp;
+    unsigned int wp = taskParams->wp;
+    unsigned int mp = taskParams->mp;
+    unsigned int kHp = taskParams->kHp;
+    unsigned int kWp = taskParams->kWp;
+    unsigned int cp = taskParams->cp;
+    unsigned int prev_wp = taskParams->prev_wp;
+    double *layer_p_output = taskParams->output;
+    double *layer_p_previous_output = taskParams->output_1;
+    const double *layer_p_bias = taskParams->bias;
+    const double *layer_p_weight = taskParams->weight;
+    unsigned int layer_p_index;
+    for (int h = 0; h < hp; h++) {
+      for (int w = 0; w < wp; w++) {
+        for (int m = 0; m < mp; m++) {
+          layer_p_index = (h * wp * mp) + (w * mp) + m;
+          layer_p_output[layer_p_index] = layer_p_bias[m];
         }
-        for (int kH = 0; kH < 3; kH++) {
-          for (int kW = 0; kW < 3; kW++) {
-            for (int c = 0; c < 1; c++) {
-              for (int m = 0; m < 12; m++) {
-                layer_2_output[h][w][m] += layer_2_weight[kH][kW][c][m] * layer_1_output[h * 1 + kH - 0][w * 1 + kW - 0][c];
+        for (int kH = 0; kH < kHp; kH++) {
+          for (int kW = 0; kW < kWp; kW++) {
+            for (int c = 0; c < cp; c++) {
+              for (int m = 0; m < mp; m++) {
+                int weightIndex = (kH * kWp * cp * mp) + (kW * cp * mp) + (c * mp) + m;
+                layer_p_index = (h * wp * mp) + (w * mp) + m;
+                int layer_p_previous_index = ((h * 1 + kH - 0) * (prev_wp * cp)) + ((w * 1 + kW - 0) * cp) + c;
+                layer_p_output[layer_p_index] += layer_p_weight[weightIndex] * layer_p_previous_output[layer_p_previous_index];
               }
             }
           }
         }
       }
     }
+    if(currentTaskHandle == layer2Handle) {
+      //printf("layer2 finished");
+      xTaskNotifyGive(layer3Handle);
+    }
+    else {
+      //printf("layer6 finished");
+      xTaskNotifyGive(layer7Handle);
+    }
+    vTaskDelete(NULL);
+  }  
+  void BatchNormalization1DTask(void *params) {
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    BatchNormalization1DTaskParams *taskParams =  static_cast<BatchNormalization1DTaskParams *>(params);
+    unsigned int dp = taskParams->dp;
+    double *layer_p_output = taskParams->output;
+    double *layer_p_previous_output = taskParams->output_1;
+    const double *layer_p_scale = taskParams->scale;
+    const double *layer_p_bias = taskParams->bias;
 
-    // Layer 3: BatchNormalization
-    for (int h = 0; h < 26; h++) {
-      for (int w = 0; w < 26; w++) {
-        for (int c = 0; c < 12; c++) {
-          layer_3_output[h][w][c] = layer_2_output[h][w][c] * layer_3_scale[c] + layer_3_bias[c];
+    for (int d = 0; d < dp; d++) {
+      layer_p_output[d] = layer_p_previous_output[d] * layer_p_scale[d] + layer_p_bias[d];
+    }
+    //printf("layer12 finished");
+    xTaskNotifyGive(layer13Handle);
+    vTaskDelete(NULL);
+  }
+
+  void BatchNormalization3DTask(void *params) {
+    TaskHandle_t currentTaskHandle = xTaskGetCurrentTaskHandle();
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    BatchNormalization3DTaskParams *taskParams = static_cast<BatchNormalization3DTaskParams *>(params);
+    unsigned int dp = taskParams->dp;
+    unsigned int wp = taskParams->wp;
+    unsigned int cp = taskParams->cp;
+    double *layer_p_output = taskParams->output;
+    double *layer_p_previous_output = taskParams->output_1;
+    const double *layer_p_scale = taskParams->scale;
+    const double *layer_p_bias = taskParams->bias;
+
+   for (int d = 0; d < dp; d++) {
+      for (int w = 0; w < wp; w++) {
+        for (int c = 0; c < cp; c++) {
+          unsigned int layer_index = (d * wp * cp) + (w * cp) + c;
+          layer_p_output[layer_index] = layer_p_previous_output[layer_index] * layer_p_scale[c] + layer_p_bias[c];
+        }
+      }
+    }
+    if(currentTaskHandle == layer3Handle) {
+      //printf("layer3 finished");
+      xTaskNotifyGive(layer4Handle);
+    }
+    else {
+      //printf("layer7 finished");
+      xTaskNotifyGive(layer8Handle);
+    }
+    vTaskDelete(NULL);
+  }
+  void Step1DTask(void *params) {
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    Step1DTaskParams *taskParams =  static_cast<Step1DTaskParams *>(params);
+    unsigned int hp = taskParams->hp;
+    double *layer_p_output = taskParams->output;
+    double *layer_p_previous_output = taskParams->output_1;
+  
+    for (int h = 0; h < hp; h++) {
+      layer_p_output[h] = layer_p_previous_output[h] > 0.0 ? 1.0 : -1.0;
+    }
+    //printf("layer13 finished");
+    xTaskNotifyGive(layer14Handle);
+    vTaskDelete(NULL);
+  }
+
+  //For Some reason the Layer 4 still makes problems with the task version
+  void Step3DTask(void *params) {
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    TaskHandle_t currentTaskHandle = xTaskGetCurrentTaskHandle();
+    Step3DTaskParams *taskParams =  static_cast<Step3DTaskParams *>(params);
+    unsigned int hp = taskParams->hp;
+    unsigned int wp = taskParams->cp;
+    unsigned int cp = taskParams->cp;
+    double *layer_p_output = taskParams->output;
+    double *layer_p_previous_output = taskParams->output_1;
+    if(currentTaskHandle == layer4Handle) {
+      for (int h = 0; h < 26; h++) {
+        for (int w = 0; w < 26; w++) {
+          for (int c = 0; c < 12; c++) {
+            layer_4_output[h][w][c] = layer_3_output[h][w][c] > 0.0 ? 1.0 : -1.0;
+          }
+        }
+      }
+    }
+    else {
+      for (int h = 0; h < hp; h++) {
+        for (int w = 0; w < wp; w++) {
+          for (int c = 0; c < cp; c++) {
+            unsigned int layer_index = (h * wp * cp) + (w * cp) + c;
+            layer_p_output[layer_index] = layer_p_previous_output[layer_index] > 0.0 ? 1.0 : -1.0;
+          }
         }
       }
     }
 
-    // Layer 4: Step
-    for (int h = 0; h < 26; h++) {
-      for (int w = 0; w < 26; w++) {
-        for (int c = 0; c < 12; c++) {
-          layer_4_output[h][w][c] = layer_3_output[h][w][c] > 0.0 ? 1.0 : -1.0;
-        }
+    if(currentTaskHandle == layer4Handle) {
+      //printf("layer4 finished");
+      xTaskNotifyGive(layer5Handle);
+    }
+    else {
+      //printf("layer8 finished");
+      xTaskNotifyGive(layer9Handle);
+    }
+    vTaskDelete(NULL);    
+  }
+void GemmTask(void *params) {
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    GemmTaskParams *taskParams = static_cast<GemmTaskParams *>(params);
+    unsigned int dp = taskParams->dp;
+    unsigned int ip = taskParams->ip;
+    double *layer_p_output = taskParams->output;
+    double *layer_p_previous_output = taskParams->output_1;
+    const double *layer_p_bias = taskParams->bias;
+    const double *layer_p_weight = taskParams->weight;
+
+    for (int d = 0; d < dp; d++) {
+      layer_p_output[d] = layer_p_bias[d];
+    }
+    for (int d = 0; d < dp; d++) {
+      for (int i = 0; i < ip; i++) {
+        int weightIndex = d * ip + i;
+        layer_p_output[d] += layer_p_weight[weightIndex] * layer_p_previous_output[i];
       }
     }
-
-    // Layer 5: MaxPool
-    for (int h = 0; h < 13; h++) {
+    TaskHandle_t currentTaskHandle = xTaskGetCurrentTaskHandle();
+    if(currentTaskHandle == layer11Handle) {
+      //printf("layer11 finished");
+      xTaskNotifyGive(layer12Handle);
+    }
+    else {
+      //printf("layer14 finished");
+      xTaskNotifyGive(layer15Handle);
+    }
+    vTaskDelete(NULL);
+  }
+  void MaxPoolTask(void *params) { 
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    TaskHandle_t currentTaskHandle = xTaskGetCurrentTaskHandle();
+    MaxPoolTaskParams *maxPoolTaskParams = static_cast<MaxPoolTaskParams *>(params);
+    int output_1_index = maxPoolTaskParams->output_1_index;
+    int p_output_index;
+    if(output_1_index == 4) {
+      for (int h = 0; h < 13; h++) {
       for (int w = 0; w < 13; w++) {
         for (int c = 0; c < 12; c++) {
           layer_5_output[h][w][c] = std::numeric_limits<double>::lowest();
@@ -92,44 +320,9 @@ void predict_SmallCnnActionBINARY5(double const * const x, double * pred) {
         }
       }
     }
-
-    // Layer 6: Conv
-    for (int h = 0; h < 11; h++) {
-      for (int w = 0; w < 11; w++) {
-        for (int m = 0; m < 12; m++) {
-          layer_6_output[h][w][m] = layer_6_bias[m];
-        }
-        for (int kH = 0; kH < 3; kH++) {
-          for (int kW = 0; kW < 3; kW++) {
-            for (int c = 0; c < 12; c++) {
-              for (int m = 0; m < 12; m++) {
-                layer_6_output[h][w][m] += layer_6_weight[kH][kW][c][m] * layer_5_output[h * 1 + kH - 0][w * 1 + kW - 0][c];
-              }
-            }
-          }
-        }
-      }
     }
-
-    // Layer 7: BatchNormalization
-    for (int h = 0; h < 11; h++) {
-      for (int w = 0; w < 11; w++) {
-        for (int c = 0; c < 12; c++) {
-          layer_7_output[h][w][c] = layer_6_output[h][w][c] * layer_7_scale[c] + layer_7_bias[c];
-        }
-      }
-    }
-
-    // Layer 8: Step
-    for (int h = 0; h < 11; h++) {
-      for (int w = 0; w < 11; w++) {
-        for (int c = 0; c < 12; c++) {
-          layer_8_output[h][w][c] = layer_7_output[h][w][c] > 0.0 ? 1.0 : -1.0;
-        }
-      }
-    }
-
-    // Layer 9: MaxPool
+    else {
+      // Layer 9: MaxPool
     for (int h = 0; h < 5; h++) {
       for (int w = 0; w < 5; w++) {
         for (int c = 0; c < 12; c++) {
@@ -144,60 +337,80 @@ void predict_SmallCnnActionBINARY5(double const * const x, double * pred) {
         }
       }
     }
-
-    // Layer 10: Reshape
-    auto layer_10_output = (double (*)) layer_9_output;
-
-    // Layer 11: Gemm
-    for (int d = 0; d < 12; d++) {
-      layer_11_output[d] = layer_11_bias[d];
     }
-    for (int d = 0; d < 12; d++) {
-      for (int i = 0; i < 300; i++) {
-        layer_11_output[d] += layer_11_weight[d][i] * layer_10_output[i];
-      }
+    if(currentTaskHandle == layer5Handle) {
+      //printf("layer5 finished");
+      xTaskNotifyGive(layer6Handle);
     }
-
-    // Layer 12: BatchNormalization
-    for (int d = 0; d < 12; d++) {
-      layer_12_output[d] = layer_11_output[d] * layer_12_scale[d] + layer_12_bias[d];
+    else {
+      //printf("layer9 finished");
+      auto layer_10_output = (double *) layer_9_output;
+      GemmTaskParams layer11params{12, 300, layer_11_output, layer_10_output, layer_11_bias, &layer_11_weight[0][0]};
+      xTaskCreate(GemmTask, "Layer11", 4192, &layer11params, 1, &layer11Handle);
+      xTaskNotifyGive(layer11Handle);
     }
-
-    // Layer 13: Step
-    for (int d = 0; d < 12; d++) {
-      layer_13_output[d] = layer_12_output[d] > 0.0 ? 1.0 : -1.0;
-    }
-
-    // Layer 14: Gemm
-    for (int d = 0; d < 10; d++) {
-      layer_14_output[d] = layer_14_bias[d];
-    }
-    for (int d = 0; d < 10; d++) {
-      for (int i = 0; i < 12; i++) {
-        layer_14_output[d] += layer_14_weight[d][i] * layer_13_output[i];
-      }
-    }
-
-    // Layer 15: LogSoftmax
+    vTaskDelete(NULL);
+  }  
+  void LogSoftmaxTask(void *params) {
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    LogSoftmaxTaskParams *taskParams = static_cast<LogSoftmaxTaskParams *>(params);
+    unsigned int dp = taskParams->dp;
+    double *layer_p_output = taskParams->output;
+    double *layer_p_previous_output = taskParams->output_1;
+    double *pred = taskParams->pred;
+    double max = 0;
+    for (int d = 0; d < dp; d++)
     {
-      double max = 0;
-      for (int d = 0; d < 10; d++) {
-        max = layer_14_output[d] >= max ? layer_14_output[d] : max;
-      }
-      double sum = 0;
-      for (int d = 0; d < 10; d++) {
-        layer_15_output[d] = std::exp(layer_14_output[d] - max);
-        sum += layer_15_output[d];
-      }
-      for (int d = 0; d < 10; d++) {
-        layer_15_output[d] = std::log(layer_15_output[d] / sum);
-      }
+      max = layer_p_previous_output[d] >= max ? layer_p_previous_output[d] : max;
     }
-
-
-    for (int i = 0; i < 10; i++) {
-        pred[i] += layer_15_output[i];
+    double sum = 0;
+    for (int d = 0; d < dp; d++)
+    {
+      layer_p_output[d] = std::exp(layer_p_previous_output[d] - max);
+      sum += layer_p_output[d];
     }
-}
+    for (int d = 0; d < dp; d++)
+    {
+      layer_p_output[d] = std::log(layer_p_output[d] / sum);
+    }
+    for (int i = 0; i < dp; i++)
+    {
+      pred[i] += layer_p_output[i];
+    }
+    //printf("layer15 finished");
+    xSemaphoreGive(mutex);
+    vTaskDelete(NULL);
+  }
 
-}
+void predict_SmallCnnActionBINARY5(double const * const x, double * pred) {
+    mutex = xSemaphoreCreateBinary();
+    auto layer_0_output = x;
+    auto layer_1_output = (double (*)[28][1]) layer_0_output;
+    ConvTaskParams layer2params{26, 26, 12, 3, 3, 1, 28, &layer_2_output[0][0][0], &layer_1_output[0][0][0], layer_2_bias, &layer_2_weight[0][0][0][0]};
+    BatchNormalization3DTaskParams layer3params{26, 26, 12, &layer_3_output[0][0][0], &layer_2_output[0][0][0], layer_3_scale, layer_3_bias};
+    Step3DTaskParams layer4params{26, 26, 12, &layer_4_output[0][0][0], &layer_3_output[0][0][0]};
+    MaxPoolTaskParams layer5params{13, 13, 12, 2, 2, &layer_5_output[0][0][0], 4};
+    ConvTaskParams layer6params{11, 11, 12, 3, 3, 12, 13, &layer_6_output[0][0][0], &layer_5_output[0][0][0], layer_6_bias, &layer_6_weight[0][0][0][0]};
+    BatchNormalization3DTaskParams layer7params{11, 11, 12, &layer_7_output[0][0][0], &layer_6_output[0][0][0], layer_7_scale, layer_7_bias};
+    Step3DTaskParams layer8params{11, 11, 12, &layer_8_output[0][0][0], &layer_7_output[0][0][0]};
+    MaxPoolTaskParams layer9params{5, 5, 12, 2, 2, &layer_9_output[0][0][0], 8};
+    BatchNormalization1DTaskParams layer12params{12, layer_12_output, layer_11_output, layer_12_scale, layer_12_bias};
+    Step1DTaskParams layer13params{12, layer_13_output, layer_12_output};
+    GemmTaskParams layer14params{10, 12, layer_14_output, layer_13_output, layer_14_bias, &layer_14_weight[0][0]};
+    LogSoftmaxTaskParams layer15params{10, layer_15_output, layer_14_output, pred, mutex};
+    xTaskCreate(ConvTask, "Layer2", 1024, &layer2params, 1, &layer2Handle);
+    xTaskCreate(BatchNormalization3DTask, "Layer3", 2048, &layer3params, 1, &layer3Handle);
+    xTaskCreate(Step3DTask, "Layer4", 2048, &layer4params, 1, &layer4Handle);
+    xTaskCreate(MaxPoolTask, "Layer5", 2048, &layer5params, 1, &layer5Handle);
+    xTaskCreate(ConvTask, "Layer6", 1024, &layer6params, 1, &layer6Handle);
+    xTaskCreate(BatchNormalization3DTask, "Layer7", 2048, &layer7params, 1, &layer7Handle);
+    xTaskCreate(Step3DTask, "Layer8", 2048, &layer8params, 1, &layer8Handle);
+    xTaskCreate(MaxPoolTask, "Layer9", 2048, &layer9params, 1, &layer9Handle);
+    xTaskCreate(BatchNormalization1DTask, "Layer12", 2048, &layer12params, 1, &layer12Handle);
+    xTaskCreate(Step1DTask, "Layer13", 1024, &layer13params, 1, &layer13Handle);
+    xTaskCreate(GemmTask, "Layer14", 1024, &layer14params, 1, &layer14Handle);
+    xTaskCreate(LogSoftmaxTask, "Layer15", 1024, &layer15params, 1, &layer15Handle);
+    xSemaphoreTake(mutex, portMAX_DELAY);
+    vSemaphoreDelete(mutex);
+  }
+} 

@@ -37,9 +37,9 @@ void init_spiffs() {
     esp_vfs_spiffs_register(&conf);
 }
 
-auto read_csv(std::string &path, unsigned int batchingSize, unsigned lineNumber, unsigned maxLine) {
-	std::vector<std::vector<double>> X;
-	std::vector<unsigned int> Y;
+void read_csv(std::string &path, unsigned int batchingSize, unsigned lineNumber, unsigned maxLine,std::vector<std::vector<double>> &X, std::vector<unsigned int> &Y ) {
+	X.clear();
+    Y.clear();
 	std::ifstream file(path);
 	std::string header;
 	std::getline(file, header);
@@ -49,7 +49,6 @@ auto read_csv(std::string &path, unsigned int batchingSize, unsigned lineNumber,
 	unsigned currentLine = 2;
 	std::stringstream ss(header);
 	std::string entry;
-	
 	if (file.is_open()) {
 		std::string line;
 		while (currentLine <= lineNumber) {
@@ -88,24 +87,22 @@ auto read_csv(std::string &path, unsigned int batchingSize, unsigned lineNumber,
 		}
 		file.close();
 	}
-		return std::make_tuple(X,Y);
 }
 void benchmark(void *params) {
-    //double output[N_CLASSES] = {0};
 	std::string path = std::string("/storage/testing.csv");
 	TaskParams *taskParams = static_cast<TaskParams*>(params);
 	unsigned int batchSize = taskParams->batchSize;
 	unsigned int repeat = taskParams->repeat;
 	unsigned int lineNumbers = taskParams->lineNumbers;
 	unsigned int summedUpMatches = 0;
-	unsigned int xSize = 0;
+	unsigned int xSize = lineNumbers - 1;
 	float accuracy;
+	double output[N_CLASSES];
+	std::vector<std::vector<double>> X;
+    std::vector<unsigned int> Y;
 
 	for(int testDataLine = 2; testDataLine <= lineNumbers; testDataLine += batchSize) {
-		auto data = read_csv(path, batchSize, testDataLine, lineNumbers);
-		std::vector<std::vector<double>> &X = std::get<0>(data);
-    	std::vector<unsigned int> &Y = std::get<1>(data);
-		double * output = new double[N_CLASSES];
+		read_csv(path, batchSize, testDataLine, lineNumbers, X, Y);
 		unsigned int matches = 0;
     	for (unsigned int k = 0; k < repeat; ++k) {	
     		matches = 0;
@@ -133,10 +130,12 @@ void benchmark(void *params) {
 				} 
 			}
     	}
-    delete[] output;
 	summedUpMatches = summedUpMatches + matches;
+	X.clear();
+	X.shrink_to_fit();
+	Y.clear();
+	Y.shrink_to_fit();
 	}
-	xSize = lineNumbers - 1;
 	std::cout << summedUpMatches << " MATCHES" << std::endl;
 	std::cout << xSize << " X SIZE" << std::endl;
     accuracy = static_cast<float>(summedUpMatches) / xSize * 100.f;
@@ -158,13 +157,13 @@ extern "C" void app_main(void){
     std::string path = std::string("/storage/testing.csv");
     unsigned int repeat = 8;
 	unsigned int batchSize = 5;
-	unsigned int lineNumbers = 25;
+	unsigned int lineNumbers = 100;
 	
     std::cout << "RUNNING BENCHMARK WITH " << repeat << " REPETITIONS" << std::endl;
 	TaskParams params1{repeat, batchSize, lineNumbers};
 	mainTaskHandle = xTaskGetCurrentTaskHandle();
 	auto start = std::chrono::high_resolution_clock::now();
-	xTaskCreate(benchmark, "Task1", 20000, &params1, 1, &benchmarkTaskHandle1);
+	xTaskCreate(benchmark, "Task1", 5000, &params1, 1, &benchmarkTaskHandle1);
 	//xTaskCreatePinnedToCore(benchmark, "Task2", 70000, &params1, 1, &benchmarkTaskHandle2, 1);
 	ulTaskNotifyTake(pdTRUE,portMAX_DELAY);
 	auto end = std::chrono::high_resolution_clock::now();
