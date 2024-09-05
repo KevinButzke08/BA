@@ -7,6 +7,7 @@
 #include "freertos/semphr.h"
 #include <string>
 #include <iostream>
+#include <chrono>
 
 namespace FAST_INFERENCE {
 
@@ -38,8 +39,8 @@ static double layer_12_output[12];
 static double layer_13_output[12];
 static double layer_14_output[10];
 static double layer_15_output[10];
-static SemaphoreHandle_t mutex;
-TaskHandle_t layer2Handle, layer3Handle, layer4Handle, layer5Handle, layer6Handle, layer7Handle, layer8Handle, layer9Handle, layer11Handle, layer12Handle, layer13Handle, layer14Handle, layer15Handle;
+static SemaphoreHandle_t mutex, convTaskSemaphore;
+TaskHandle_t layer2Handle, layer3Handle, layer4Handle, layer5Handle, layer6Handle, layer7Handle, layer8Handle, layer9Handle, layer11Handle, layer12Handle, layer13Handle, layer14Handle, layer15Handle, convTaskCore0, convTaskCore1;
 
 struct MaxPoolTaskParams
   {
@@ -114,15 +115,10 @@ struct MaxPoolTaskParams
     double* pred;
     SemaphoreHandle_t mutex;
   };
-  
-  void ConvTask(void *params) {
+  void ConvTaskCore0(void *params) {
     TaskHandle_t currentTaskHandle = xTaskGetCurrentTaskHandle();
-    if(currentTaskHandle == layer6Handle) {
+    if(currentTaskHandle == convTaskCore0) {
       ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-    }
-    else {
-      //Waiting for all the other Taskhandel to load and be not NULL
-      vTaskDelay(1);
     }
     ConvTaskParams *taskParams = static_cast<ConvTaskParams *>(params);
     unsigned int hp = taskParams->hp;
@@ -137,7 +133,7 @@ struct MaxPoolTaskParams
     const double *layer_p_bias = taskParams->bias;
     const double *layer_p_weight = taskParams->weight;
     unsigned int layer_p_index;
-    for (int h = 0; h < hp; h++) {
+    for (int h = 0; h < (hp / 2); h++) {
       for (int w = 0; w < wp; w++) {
         for (int m = 0; m < mp; m++) {
           layer_p_index = (h * wp * mp) + (w * mp) + m;
@@ -157,6 +153,61 @@ struct MaxPoolTaskParams
         }
       }
     }
+    xSemaphoreGive(convTaskSemaphore);
+    vTaskDelete(NULL);
+  }
+  void ConvTaskCore1(void *params) {
+    TaskHandle_t currentTaskHandle = xTaskGetCurrentTaskHandle();
+    if(currentTaskHandle == convTaskCore1) {
+      ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    }
+    ConvTaskParams *taskParams = static_cast<ConvTaskParams *>(params);
+    unsigned int hp = taskParams->hp;
+    unsigned int wp = taskParams->wp;
+    unsigned int mp = taskParams->mp;
+    unsigned int kHp = taskParams->kHp;
+    unsigned int kWp = taskParams->kWp;
+    unsigned int cp = taskParams->cp;
+    unsigned int prev_wp = taskParams->prev_wp;
+    double *layer_p_output = taskParams->output;
+    double *layer_p_previous_output = taskParams->output_1;
+    const double *layer_p_bias = taskParams->bias;
+    const double *layer_p_weight = taskParams->weight;
+    unsigned int layer_p_index;
+    for (int h = (hp / 2); h < hp; h++) {
+      for (int w = 0; w < wp; w++) {
+        for (int m = 0; m < mp; m++) {
+          layer_p_index = (h * wp * mp) + (w * mp) + m;
+          layer_p_output[layer_p_index] = layer_p_bias[m];
+        }
+        for (int kH = 0; kH < kHp; kH++) {
+          for (int kW = 0; kW < kWp; kW++) {
+            for (int c = 0; c < cp; c++) {
+              for (int m = 0; m < mp; m++) {
+                int weightIndex = (kH * kWp * cp * mp) + (kW * cp * mp) + (c * mp) + m;
+                layer_p_index = (h * wp * mp) + (w * mp) + m;
+                int layer_p_previous_index = ((h * 1 + kH - 0) * (prev_wp * cp)) + ((w * 1 + kW - 0) * cp) + c;
+                layer_p_output[layer_p_index] += layer_p_weight[weightIndex] * layer_p_previous_output[layer_p_previous_index];
+              }
+            }
+          }
+        }
+      }
+    }
+    xSemaphoreGive(convTaskSemaphore);
+    vTaskDelete(NULL);
+  }
+  void ConvTask(void *params) {
+    TaskHandle_t currentTaskHandle = xTaskGetCurrentTaskHandle();
+    if(currentTaskHandle == layer6Handle) {
+      ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    }
+    else {
+      //Waiting for all the other Taskhandel to load and be not NULL
+      vTaskDelay(1);
+    }
+      xSemaphoreTake(convTaskSemaphore, portMAX_DELAY);
+      xSemaphoreTake(convTaskSemaphore, portMAX_DELAY);
     if(currentTaskHandle == layer2Handle) {
       //printf("layer2 finished");
       xTaskNotifyGive(layer3Handle);
@@ -212,10 +263,13 @@ struct MaxPoolTaskParams
       //printf("layer7 finished");
       xTaskNotifyGive(layer8Handle);
     }
+    //auto end = std::chrono::high_resolution_clock::now();
+    //std::cout << "BatchNormalization3DTask " << std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count()<< std::endl;
     vTaskDelete(NULL);
   }
   void Step1DTask(void *params) {
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    //auto start = std::chrono::high_resolution_clock::now();
     Step1DTaskParams *taskParams =  static_cast<Step1DTaskParams *>(params);
     unsigned int hp = taskParams->hp;
     double *layer_p_output = taskParams->output;
@@ -322,7 +376,6 @@ void GemmTask(void *params) {
     }
     }
     else {
-      // Layer 9: MaxPool
     for (int h = 0; h < 5; h++) {
       for (int w = 0; w < 5; w++) {
         for (int c = 0; c < 12; c++) {
@@ -340,6 +393,8 @@ void GemmTask(void *params) {
     }
     if(currentTaskHandle == layer5Handle) {
       //printf("layer5 finished");
+      xTaskNotifyGive(convTaskCore0);
+      xTaskNotifyGive(convTaskCore1);
       xTaskNotifyGive(layer6Handle);
     }
     else {
@@ -384,6 +439,7 @@ void GemmTask(void *params) {
 
 void predict_SmallCnnActionBINARY5(double const * const x, double * pred) {
     mutex = xSemaphoreCreateBinary();
+    convTaskSemaphore = xSemaphoreCreateCounting(2,0);
     auto layer_0_output = x;
     auto layer_1_output = (double (*)[28][1]) layer_0_output;
     ConvTaskParams layer2params{26, 26, 12, 3, 3, 1, 28, &layer_2_output[0][0][0], &layer_1_output[0][0][0], layer_2_bias, &layer_2_weight[0][0][0][0]};
@@ -398,19 +454,24 @@ void predict_SmallCnnActionBINARY5(double const * const x, double * pred) {
     Step1DTaskParams layer13params{12, layer_13_output, layer_12_output};
     GemmTaskParams layer14params{10, 12, layer_14_output, layer_13_output, layer_14_bias, &layer_14_weight[0][0]};
     LogSoftmaxTaskParams layer15params{10, layer_15_output, layer_14_output, pred, mutex};
-    xTaskCreate(ConvTask, "Layer2", 1024, &layer2params, 1, &layer2Handle);
+    xTaskCreatePinnedToCore(ConvTaskCore0, "ConvTaskCore0Layer2", 1500, &layer2params, 1, NULL, 0);
+    xTaskCreatePinnedToCore(ConvTaskCore1, "ConvTaskCore1Layer2", 1500, &layer2params, 1, NULL, 1);
+    xTaskCreate(ConvTask, "Layer2", 1500, NULL, 1, &layer2Handle);
     xTaskCreate(BatchNormalization3DTask, "Layer3", 2048, &layer3params, 1, &layer3Handle);
     xTaskCreate(Step3DTask, "Layer4", 2048, &layer4params, 1, &layer4Handle);
     xTaskCreate(MaxPoolTask, "Layer5", 2048, &layer5params, 1, &layer5Handle);
-    xTaskCreate(ConvTask, "Layer6", 1024, &layer6params, 1, &layer6Handle);
+    xTaskCreatePinnedToCore(ConvTaskCore0, "ConvTaskCore0Layer6", 1500, &layer6params, 1, &convTaskCore0, 0);
+    xTaskCreatePinnedToCore(ConvTaskCore1, "ConvTaskCore1Layer6", 1500, &layer6params, 1, &convTaskCore1, 1);
+    xTaskCreate(ConvTask, "Layer6", 1500, NULL, 1, &layer6Handle);
     xTaskCreate(BatchNormalization3DTask, "Layer7", 2048, &layer7params, 1, &layer7Handle);
     xTaskCreate(Step3DTask, "Layer8", 2048, &layer8params, 1, &layer8Handle);
     xTaskCreate(MaxPoolTask, "Layer9", 2048, &layer9params, 1, &layer9Handle);
     xTaskCreate(BatchNormalization1DTask, "Layer12", 2048, &layer12params, 1, &layer12Handle);
-    xTaskCreate(Step1DTask, "Layer13", 1024, &layer13params, 1, &layer13Handle);
-    xTaskCreate(GemmTask, "Layer14", 1024, &layer14params, 1, &layer14Handle);
-    xTaskCreate(LogSoftmaxTask, "Layer15", 1024, &layer15params, 1, &layer15Handle);
+    xTaskCreate(Step1DTask, "Layer13", 2048, &layer13params, 1, &layer13Handle);
+    xTaskCreate(GemmTask, "Layer14", 2048, &layer14params, 1, &layer14Handle);
+    xTaskCreate(LogSoftmaxTask, "Layer15", 2048, &layer15params, 1, &layer15Handle);
     xSemaphoreTake(mutex, portMAX_DELAY);
     vSemaphoreDelete(mutex);
+    vSemaphoreDelete(convTaskSemaphore);
   }
 } 
