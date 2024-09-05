@@ -1,0 +1,32 @@
+-Abstract
+-1.Einleitung:
+	-Ziel der Arbeit
+	-Kontext im Bezug auf das Forschungsprojekt
+	-Aufbau der Arbeit
+-2.Grundlagen:
+	-Neuronale Netze: Ablauf von Testen, basic Verständnis, typischer Aufbau, CNN
+	-FreeRTOS: Tasks, Einsatzgebiet auf Embedded Systems
+	-FastInference?
+	-Multithreading?
+-3.Implementierung:
+	-Vorstellen der orignalen Modellen
+	-Zeigen der Implementierung an einzelnen Tasks
+	-Hinblick auf die Speicherkosten einzelner Tasks (Stack-size, Task deletion)
+	-Synchronisation von Tasks (Notifications, Mutexen, Semaphore)
+	-Batching Implementierung?
+	-Multithreading mit FreeRTOS
+-4.Analyse der Ergebnisse:
+	-Benchmark Graphen der Ergebnisse
+	-Vergleich der Performance zwischen Original vs Task vs Task mit Batching vs Task mit Batching & Multithreading
+	-Vergleich zwischen CNN (größer) zu orignialen NN (kleiner)
+	-Multithreading Speicherintensität betrachten
+-5.Diskussion:
+	-Vor und Nachteile beim Einsatz von FreeRTOS Tasks
+	-Herausforderungen bei der Implementierung(Speicherknappheit, Stack-sizes, Race conditions, Verwerfen von Multi-core Batching)
+-6.Fazit
+	-Zusammenfassung der Ergebnisse
+	-Ausblick für weitere Analysen in dem Gebiet
+-7.Literaturverzeichnis
+-Anhang:
+	-Code
+	-Alle Benchmark Daten roh
