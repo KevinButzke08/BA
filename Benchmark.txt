@@ -135,7 +135,7 @@ Difference: -10.84		Difference: -10.84
 TOTAL RUNTIME: 12780		TOTAL RUNTIME: 12837 ms
 Latency: 319.5 [ms/elem]	Latency: 320.925 [ms/elem]
 -------------------------------------------------------------------------------------------------------------------
-BATCH:
+BATCH (5) CNN:
 [25]:
 15 MATCHES
 24 X SIZE
@@ -144,4 +144,154 @@ Difference: -8.34
 62.5,70.84,-8.34
 TOTAL RUNTIME: 61664 ms
 Latency: 321.167 [ms/elem]
- 
+
+[50]:
+32 MATCHES
+49 X SIZE
+Reference Accuracy: 70.84 %
+Difference: -5.53388
+65.3061,70.84,-5.53388
+TOTAL RUNTIME: 126.142 ms
+Latency: 321.791 [ms/elem]
+
+[100]:
+62 MATCHES
+99 X SIZE
+Reference Accuracy: 70.84 %
+Difference: -8.21374
+62.6263,70.84,-8.21374
+TOTAL RUNTIME: 256.592 ms
+Latency: 323.98 [ms/elem] 
+-------------------------------------------------------------------------------------------------------------------
+-GRÖßERE BATCH SIZE FÜHRT ZU EINER BESSEREN LAUFZEIT
+BATCH (5) CNN FREERTOS TASKS:
+[10]:
+RUNNING BENCHMARK WITH 8 REPETITIONS
+5 MATCHES
+9 X SIZE
+Reference Accuracy: 70.84 %
+Difference: -15.2844
+55.5556,70.84,-15.2844
+TOTAL RUNTIME: 24738 ms
+Latency: 343.583 [ms/elem]
+[25]:
+15 MATCHES
+24 X SIZE
+Reference Accuracy: 70.84 %
+Difference: -8.34
+62.5,70.84,-8.34
+TOTAL RUNTIME: 66325 ms
+Latency: 345.443 [ms/elem]
+[50]:
+32 MATCHES
+49 X SIZE
+Reference Accuracy: 70.84 %
+Difference: -5.53388
+65.3061,70.84,-5.53388
+TOTAL RUNTIME: 136.034 ms
+Latency: 347.026 [ms/elem]
+[100]:
+62 MATCHES
+99 X SIZE
+Reference Accuracy: 70.84 %
+Difference: -8.21374
+62.6263,70.84,-8.21374
+TOTAL RUNTIME: 274.690 ms
+Latency: 346.831 [ms/elem]
+---------------------------------------------------------------------------------------------------------------------------------------------------
+MULTITHREADING OF BATCHING:
+[20]:
+6 MATCHES
+19 X SIZE
+Reference Accuracy: 70.84 %
+Difference: -39.2611
+31.5789,70.84,-39.2611
+[10]:
+5 MATCHES
+9 X SIZE
+Reference Accuracy: 70.84 %
+Difference: -15.2844
+55.5556,70.84,-15.2844
+TOTAL RUNTIME: 24698 ms
+Latency: 343.028 [ms/elem]
+[16]:
+9 MATCHES
+15 X SIZE
+Reference Accuracy: 70.84 %
+Difference: -10.84
+60,70.84,-10.84
+TOTAL RUNTIME: 41236 ms
+Latency: 343.633 [ms/elem]
+TOTAL RUNTIME: 41227 ms
+Latency: 343.558 [ms/elem]
+[100]:
+62 MATCHES
+99 X SIZE
+Reference Accuracy: 70.84 %
+Difference: -8.21374
+62.6263,70.84,-8.21374
+TOTAL RUNTIME: 274.667 ms
+Latency: 346.802 [ms/elem]
+-TODO:
+-Update schreiben DONE
+-Multi-Core ausprobieren HELL YEAH
+-Erste Gliederung
+---------------------------------------------------------------------------------------------------------------------------------------------------
+MULTICORE IN DEN TASKS AN SICH & MULTITHREADING OF BATCHING:
+-ConvTask dauert mit Abstand am längsten -> Größter Performance Gain
+-Angaben gemessen in ms mit Batch size 5
+ConvTask 87
+BatchNormalization3DTask 9
+Step3DTask 3
+MaxPoolTask: 4
+ConvTask 218
+BatchNormalization3DTask 1
+Step3DTask 0
+MaxPoolTask: 0
+GemmTask 4
+BatchNormalization1DTask 0
+Step1DTask 0
+GemmTask 0
+LogSoftmaxTask: 0
+[10]:
+5 MATCHES
+9 X SIZE
+Reference Accuracy: 70.84 %
+Difference: -15.2844
+55.5556,70.84,-15.2844
+TOTAL RUNTIME: 14283 ms
+Latency: 198.375 [ms/elem]
+---------------------------------------------------------------------------------------------------------------------------------------------
+MULTITHREADING IN CONV TASK & BATCHING:
+[10]:
+5 MATCHES
+9 X SIZE
+Reference Accuracy: 70.84 %
+Difference: -15.2844
+55.5556,70.84,-15.2844
+TOTAL RUNTIME: 14228 ms
+Latency: 197.611 [ms/elem]
+[25]:
+15 MATCHES
+24 X SIZE
+Reference Accuracy: 70.84 %
+Difference: -8.34
+62.5,70.84,-8.34
+TOTAL RUNTIME: 38105 ms
+Latency: 198.464 [ms/elem]
+[50]:
+32 MATCHES
+49 X SIZE
+Reference Accuracy: 70.84 %
+Difference: -5.53388
+65.3061,70.84,-5.53388
+TOTAL RUNTIME: 78105 ms
+Latency: 199.247 [ms/elem]
+[100]:
+62 MATCHES
+99 X SIZE
+Reference Accuracy: 70.84 %
+Difference: -8.21374
+62.6263,70.84,-8.21374
+TOTAL RUNTIME: 159.351 ms
+Latency: 201.201 [ms/elem]
