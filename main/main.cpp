@@ -126,6 +126,7 @@ void benchmark(void *params) {
 					}
 				} 
 			}
+			
     	}
 	matchesCore0 = matchesCore0 + matches;
 	X.clear();
@@ -142,13 +143,13 @@ extern "C" void app_main(void){
     std::string path = std::string("/storage/testing.csv");
     unsigned int repeat = 8;
 	unsigned int batchSize = 5;
-	unsigned int lineNumbers = 10;
+	unsigned int lineNumbers = 100;
 	unsigned int combinedMatches = 0;
     std::cout << "RUNNING BENCHMARK WITH " << repeat << " REPETITIONS" << std::endl;
 	TaskParams params1{repeat, batchSize, lineNumbers};
 	mainTaskHandle = xTaskGetCurrentTaskHandle();
 	auto start = std::chrono::high_resolution_clock::now();
-	xTaskCreate(benchmark, "BenchmarkTask1", 4000, &params1, 1, &benchmarkTaskHandle1);
+	xTaskCreate(benchmark, "BenchmarkTask1", 7500, &params1, 1, &benchmarkTaskHandle1);
 	//xTaskCreatePinnedToCore(benchmark, "BenchmarkTask2", 4000, &params1, 1, &benchmarkTaskHandle2, 1);
 	ulTaskNotifyTake(pdTRUE,portMAX_DELAY);
 	combinedMatches = matchesCore0 + matchesCore1;
