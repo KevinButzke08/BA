@@ -25,7 +25,7 @@ TOTAL RUNTIME:1123 Latency: 10.0268 [ms/elem]
 SIMPLE_FEED_FORWARD_MLP:
 [17]: 
 -DUO CORE BENCHMARK AND TASK GENERATING FOR LAYERS:		-DUO CORE BENCHMARK AND TASK GENERATING FOR LAYERS#2:
-Reference Accuracy: 80.8 %					REF acc: 80.8%
+Reference Accuracy: 80.8 %					REF acc: 80.8% 
 Difference: -37.05						Differnce: -5.8
 43.75,80.8,-37.05						75,80.8,-5,8
 69472 USED STACK SIZE 						69472 USED STACK SIZE
@@ -136,6 +136,14 @@ TOTAL RUNTIME: 12780		TOTAL RUNTIME: 12837 ms
 Latency: 319.5 [ms/elem]	Latency: 320.925 [ms/elem]
 -------------------------------------------------------------------------------------------------------------------
 BATCH (5) CNN:
+[10]:
+5 MATCHES
+9 X SIZE
+Reference Accuracy: 70.84 %
+Difference: -15.2844
+55.5556,70.84,-15.2844
+TOTAL RUNTIME: 23048 ms
+Latency: 320.111 [ms/elem]
 [25]:
 15 MATCHES
 24 X SIZE
@@ -144,7 +152,6 @@ Difference: -8.34
 62.5,70.84,-8.34
 TOTAL RUNTIME: 61664 ms
 Latency: 321.167 [ms/elem]
-
 [50]:
 32 MATCHES
 49 X SIZE
@@ -153,7 +160,6 @@ Difference: -5.53388
 65.3061,70.84,-5.53388
 TOTAL RUNTIME: 126.142 ms
 Latency: 321.791 [ms/elem]
-
 [100]:
 62 MATCHES
 99 X SIZE
@@ -161,7 +167,15 @@ Reference Accuracy: 70.84 %
 Difference: -8.21374
 62.6263,70.84,-8.21374
 TOTAL RUNTIME: 256.592 ms
-Latency: 323.98 [ms/elem] 
+Latency: 323.98 [ms/elem]
+[200]:
+134 MATCHES
+199 X SIZE
+Reference Accuracy: 70.84 %
+Difference: -3.50331
+67.3367,70.84,-3.50331
+TOTAL RUNTIME: 519.888 ms
+Latency: 326.563 [ms/elem]
 -------------------------------------------------------------------------------------------------------------------
 -GRÖßERE BATCH SIZE FÜHRT ZU EINER BESSEREN LAUFZEIT
 BATCH (5) CNN FREERTOS TASKS:
@@ -174,6 +188,7 @@ Difference: -15.2844
 55.5556,70.84,-15.2844
 TOTAL RUNTIME: 24738 ms
 Latency: 343.583 [ms/elem]
+MAXIMUM HEAP USAGE: 65680 FREE BYTES
 [25]:
 15 MATCHES
 24 X SIZE
@@ -182,6 +197,7 @@ Difference: -8.34
 62.5,70.84,-8.34
 TOTAL RUNTIME: 66325 ms
 Latency: 345.443 [ms/elem]
+MAXIMUM HEAP USAGE: 53124 FREE BYTES
 [50]:
 32 MATCHES
 49 X SIZE
@@ -190,6 +206,7 @@ Difference: -5.53388
 65.3061,70.84,-5.53388
 TOTAL RUNTIME: 136.034 ms
 Latency: 347.026 [ms/elem]
+MAXIMUM HEAP USAGE: 53124 FREE BYTES
 [100]:
 62 MATCHES
 99 X SIZE
@@ -198,6 +215,16 @@ Difference: -8.21374
 62.6263,70.84,-8.21374
 TOTAL RUNTIME: 274.690 ms
 Latency: 346.831 [ms/elem]
+MAXIMUM HEAP USAGE: 53128 FREE BYTES
+[100]: 10 BATCHSIZE:
+62 MATCHES
+99 X SIZE
+Reference Accuracy: 70.84 %
+Difference: -8.21374
+62.6263,70.84,-8.21374
+TOTAL RUNTIME: 273.739 ms
+Latency: 345.63 [ms/elem]
+MAXIMUM HEAP USAGE: 24020 FREE BYTES
 ---------------------------------------------------------------------------------------------------------------------------------------------------
 MULTITHREADING OF BATCHING:
 [20]:
@@ -232,10 +259,11 @@ Difference: -8.21374
 62.6263,70.84,-8.21374
 TOTAL RUNTIME: 274.667 ms
 Latency: 346.802 [ms/elem]
+
 -TODO:
 -Update schreiben DONE
 -Multi-Core ausprobieren HELL YEAH
--Erste Gliederung
+-Erste Gliederung JO
 ---------------------------------------------------------------------------------------------------------------------------------------------------
 MULTICORE IN DEN TASKS AN SICH & MULTITHREADING OF BATCHING:
 -ConvTask dauert mit Abstand am längsten -> Größter Performance Gain
@@ -262,7 +290,7 @@ Difference: -15.2844
 TOTAL RUNTIME: 14283 ms
 Latency: 198.375 [ms/elem]
 ---------------------------------------------------------------------------------------------------------------------------------------------
-MULTITHREADING IN CONV TASK & BATCHING:
+MULTITHREADING IN CONV TASK + BATCHING:
 [10]:
 5 MATCHES
 9 X SIZE
@@ -295,3 +323,630 @@ Difference: -8.21374
 62.6263,70.84,-8.21374
 TOTAL RUNTIME: 159.351 ms
 Latency: 201.201 [ms/elem]
+--------------------------------------------------------------------------------------------------------------------
+MULTITHREADING IN CONV TASK & BATCH3D + BATCHING:
+---For some reason, the execution sometimes freezes and gets only resolved when using more print Statements?
+[10]:
+5 MATCHES
+9 X SIZE
+Reference Accuracy: 70.84 %
+Difference: -15.2844
+55.5556,70.84,-15.2844
+TOTAL RUNTIME: 13837 ms
+Latency: 192.181 [ms/elem]
+[25]:
+15 MATCHES
+24 X SIZE
+Reference Accuracy: 70.84 %
+Difference: -8.34
+62.5,70.84,-8.34
+TOTAL RUNTIME: 37062 ms
+Latency: 193.031 [ms/elem]
+[50]:
+32 MATCHES
+49 X SIZE
+Reference Accuracy: 70.84 %
+Difference: -5.53388
+65.3061,70.84,-5.53388
+TOTAL RUNTIME: 77815 ms
+Latency: 198.508 [ms/elem]
+[100]:
+62 MATCHES
+99 X SIZE
+Reference Accuracy: 70.84 %
+Difference: -8.21374
+62.6263,70.84,-8.21374
+TOTAL RUNTIME: 158.309 ms
+Latency: 199.885 [ms/elem]
+-------------------------------------------------------------------------------------------------------------------
+MULTITHREADING IN CONV TASK & BATCH3D + BATCHING REWORKED VERSION ( MORE STABLE & RELIABLE)
+-100 with 5 Batchsize somehow still freezes
+[10]:
+5 MATCHES
+9 X SIZE
+Reference Accuracy: 70.84 %
+Difference: -15.2844
+55.5556,70.84,-15.2844
+TOTAL RUNTIME: 14178 ms
+Latency: 196.917 [ms/elem]
+MAXIMUM HEAP USAGE: 43124 FREE BYTES
+[25]:
+15 MATCHES
+24 X SIZE
+Reference Accuracy: 70.84 %
+Difference: -8.34
+62.5,70.84,-8.34
+TOTAL RUNTIME: 37843 ms
+Latency: 197.099 [ms/elem]
+MAXIMUM HEAP USAGE: 42416 FREE BYTES
+[50]:
+32 MATCHES
+49 X SIZE
+Reference Accuracy: 70.84 %
+Difference: -5.53388
+65.3061,70.84,-5.53388
+TOTAL RUNTIME: 77825 ms
+Latency: 198.533 [ms/elem]
+MAXIMUM HEAP USAGE: 41788 FREE BYTES
+[100]: 10 BATCHSIZE:
+62 MATCHES
+99 X SIZE
+Reference Accuracy: 70.84 %
+Difference: -8.21374
+62.6263,70.84,-8.21374
+TOTAL RUNTIME: 157.269 ms
+Latency: 198.572 [ms/elem]
+MAXIMUM HEAP USAGE: 10084 FREE BYTES
+-------------------------------------------------------------------------------------------------------------------
+VERGLEICH VON (MULTITHREADING IN CONV TASK & BATCH3D CNN + BATCHING) VS (MULTITHREADING BATCHING WITH CNN)
+So 2 Cores execute the model at the same time
+[10]:
+-Klonen von Model und gucken ob es klappt
+-Modell ist einfach zu groß -> Kleines Modell nutzen
+--------------------------------------------------------------------------------------------------------------------
+START MODEL = TASK EXECUTION & BATCHING, SYNCH OVER SEMAPHORES AND SEPERATE TASK CREATION
+[25]:
+20 MATCHES
+24 X SIZE
+Reference Accuracy: 80.8 %
+Difference: 2.53333
+83.3333,80.8,2.53333
+TOTAL RUNTIME: 2264 ms
+Latency: 11.7917 [ms/elem]
+[50]:
+38 MATCHES
+49 X SIZE
+Reference Accuracy: 80.8 %
+Difference: -3.24898
+77.551,80.8,-3.24898
+TOTAL RUNTIME: 4864 ms
+Latency: 12.4082 [ms/elem]
+[100]:
+77 MATCHES
+99 X SIZE
+Reference Accuracy: 80.8 %
+Difference: -3.02222
+77.7778,80.8,-3.02222
+TOTAL RUNTIME: 10724 ms
+Latency: 13.5404 [ms/elem]
+[200]:
+--------------------------------------------------------------------------------------------------------------------
+REWORKING OF START MODEL = TASK EXECUTION & BATCHING, SYNCH OVER NOTIFICATIONS AND DIRECT TASK CREATION
+-bit faster
+-Memory: ?LATER? Most likley worse
+[25]:
+20 MATCHES
+24 X SIZE
+Reference Accuracy: 80.8 %
+Difference: 2.53333
+83.3333,80.8,2.53333
+TOTAL RUNTIME: 2260 ms
+Latency: 11.7708 [ms/elem]
+[50]:
+38 MATCHES
+49 X SIZE
+Reference Accuracy: 80.8 %
+Difference: -3.24898
+77.551,80.8,-3.24898
+TOTAL RUNTIME: 4841 ms
+Latency: 12.3495 [ms/elem]
+[100]:
+77 MATCHES
+99 X SIZE
+Reference Accuracy: 80.8 %
+Difference: -3.02222
+77.7778,80.8,-3.02222
+TOTAL RUNTIME: 10701 ms
+Latency: 13.5114 [ms/elem]
+[200]:
+165 MATCHES
+199 X SIZE
+Reference Accuracy: 80.8 %
+Difference: 2.11457
+82.9146,80.8,2.11457
+TOTAL RUNTIME: 25321 ms
+Latency: 15.9052 [ms/elem]
+BIGGER BATCHES -> BETTER PERFORMANCE FOR EXAMPLE:
+[200] 10 BATCHSIZE:
+165 MATCHES
+199 X SIZE
+Reference Accuracy: 80.8 %
+Difference: 2.11457
+82.9146,80.8,2.11457
+TOTAL RUNTIME: 21401 ms
+Latency: 13.4428 [ms/elem]
+[200] 20 BATCHSIZE:
+165 MATCHES
+199 X SIZE
+Reference Accuracy: 80.8 %
+Difference: 2.11457
+82.9146,80.8,2.11457
+TOTAL RUNTIME: 19441 ms
+Latency: 12.2117 [ms/elem]
+--------------------------------------------------------------------------------------------------------------------
+-Started on implementing Multithreading the same way in the cnn version, but random deadlocks are stil the case
+TASK EXECUTION & BATCHING, SYNCH OVER NOTIFICATIONS AND DIRECT TASK CREATION & GEMMTASK MULTITHREADING
+[25]:
+20 MATCHES
+24 X SIZE
+Reference Accuracy: 80.8 %
+Difference: 2.53333
+83.3333,80.8,2.53333
+TOTAL RUNTIME: 2237 ms
+Latency: 11.651 [ms/elem]
+[50]:
+38 MATCHES
+49 X SIZE
+Reference Accuracy: 80.8 %
+Difference: -3.24898
+77.551,80.8,-3.24898
+TOTAL RUNTIME: 4778 ms
+Latency: 12.1888 [ms/elem]
+[200]:
+165 MATCHES
+199 X SIZE
+Reference Accuracy: 80.8 %
+Difference: 2.11457
+82.9146,80.8,2.11457
+TOTAL RUNTIME: 25168 ms
+Latency: 15.809 [ms/elem]
+[200]: 10 BATCHSIZE:
+165 MATCHES
+199 X SIZE
+Reference Accuracy: 80.8 %
+Difference: 2.11457
+82.9146,80.8,2.11457
+TOTAL RUNTIME: 21348 ms
+Latency: 13.4095 [ms/elem]
+[200]: 20 BATCHSIZE:
+165 MATCHES
+199 X SIZE
+Reference Accuracy: 80.8 %
+Difference: 2.11457
+82.9146,80.8,2.11457
+TOTAL RUNTIME: 19388 ms
+Latency: 12.1784 [ms/elem]
+[200]: 50 BATCHSIZE:
+165 MATCHES
+199 X SIZE
+Reference Accuracy: 80.8 %
+Difference: 2.11457
+82.9146,80.8,2.11457
+TOTAL RUNTIME: 18238 ms
+Latency: 11.456 [ms/elem]
+--------------------------------------------------------------------------------------------------------------------
+TASK EXECUTION & MULTI-CORE BATCHING, SYNCH OVER NOTIFICATIONS AND DIRECT TASK CREATION
+-BUILD A NEW FUNCTION FOR THE SECOND CORE TO SEE IF IT EXECUTES AT THE SAME TIME
+-RIGHT NOW THE SECOND CORE WONT EXECUTE THE METHOD FOR SOME REASON
+TOTAL RUNTIME: 6286 ms
+Latency: 16.0357 [ms/elem]
+-STILL AFTER SEVERAL TRIES AND SOLUTIONS, THE SECOND CORE WILL STOP/DEADLOCK FOR SOME REASON
+-ONE SOLUTION IS A TIMEOUT, BUT THIS MAKES IT SO SLOW THAT IS NOT EVEN WORTH IT
+38 MATCHES
+49 X SIZE
+Reference Accuracy: 80.8 %
+Difference: -3.24898
+77.551,80.8,-3.24898
+TOTAL RUNTIME: 2691 ms
+Latency: 6.8648 [ms/elem]
+
+-GO BACK TO OG_MODEL AND TEST THERE MULTITHREADING WITHOUT TASK STRUCTURE
+
+
+-------------------------------------------------------------------------------------------------------------------
+START MODEL & BATCHING
+[50]:
+38 MATCHES
+49 X SIZE
+Reference Accuracy: 80.8 %
+Difference: -3.24898
+77.551,80.8,-3.24898
+TOTAL RUNTIME: 3974 ms
+Latency: 10.1378 [ms/elem]
+MAXIMUM HEAP USAGE: 314892 FREE BYTES
+[100]:
+77 MATCHES
+99 X SIZE
+Reference Accuracy: 80.8 %
+Difference: -3.02222
+77.7778,80.8,-3.02222
+TOTAL RUNTIME: 9025 ms
+Latency: 11.3952 [ms/elem]
+MAXIMUM HEAP USAGE: 314736 FREE BYTES
+[200]:
+165 MATCHES
+199 X SIZE
+Reference Accuracy: 80.8 %
+Difference: 2.11457
+82.9146,80.8,2.11457
+TOTAL RUNTIME: 21975 ms
+Latency: 13.8034 [ms/elem]
+MAXIMUM HEAP USAGE: 314648 FREE BYTES
+[200]: 10 BATCHSIZE:
+165 MATCHES
+199 X SIZE
+Reference Accuracy: 80.8 %
+Difference: 2.11457
+82.9146,80.8,2.11457
+TOTAL RUNTIME: 18100 ms
+Latency: 11.3693 [ms/elem]
+MAXIMUM HEAP USAGE: 283140 FREE BYTES
+[200]: 20 BATCHSIZE:
+165 MATCHES
+199 X SIZE
+Reference Accuracy: 80.8 %
+Difference: 2.11457
+82.9146,80.8,2.11457
+TOTAL RUNTIME: 16161 ms
+Latency: 10.1514 [ms/elem]
+MAXIMUM HEAP USAGE: 220124 FREE BYTES
+[200]: 50 BATCHSIZE:
+165 MATCHES
+199 X SIZE
+Reference Accuracy: 80.8 %
+Difference: 2.11457
+82.9146,80.8,2.11457
+TOTAL RUNTIME: 14998 ms
+Latency: 9.42085 [ms/elem]
+MAXIMUM HEAP USAGE: 21072 FREE BYTES
+--------------------------------------------------------------------------------------------------------------------
+START MODEL & MULTI-CORE BATCHING:
+[50]:
+38 MATCHES
+49 X SIZE
+Reference Accuracy: 80.8 %
+Difference: -3.24898
+77.551,80.8,-3.24898
+TOTAL RUNTIME: 2160 ms
+Latency: 5.5102 [ms/elem]
+MAXIMUM HEAP USAGE: 274516 FREE BYTES
+[100]:
+77 MATCHES
+99 X SIZE
+Reference Accuracy: 80.8 %
+Difference: -3.02222
+77.7778,80.8,-3.02222
+TOTAL RUNTIME: 5517 ms
+Latency: 6.96591 [ms/elem]
+MAXIMUM HEAP USAGE: 268424 FREE BYTES
+[200]:
+165 MATCHES
+199 X SIZE
+Reference Accuracy: 80.8 %
+Difference: 2.11457
+82.9146,80.8,2.11457
+TOTAL RUNTIME: 15285 ms
+Latency: 9.60113 [ms/elem]
+MAXIMUM HEAP USAGE: 262136 FREE BYTES
+[200] 10 BATCHSIZE:
+165 MATCHES
+199 X SIZE
+Reference Accuracy: 80.8 %
+Difference: 2.11457
+82.9146,80.8,2.11457
+TOTAL RUNTIME: 11286 ms
+Latency: 7.0892 [ms/elem]
+MAXIMUM HEAP USAGE: 215116 FREE BYTES
+[200] 20 BATCHSIZE:
+165 MATCHES
+199 X SIZE
+Reference Accuracy: 80.8 %
+Difference: 2.11457
+82.9146,80.8,2.11457
+TOTAL RUNTIME: 8990 ms
+Latency: 5.64699 [ms/elem]
+MAXIMUM HEAP USAGE: 89092 FREE BYTES
+-200 50 Batchsize was not possible, memory not sufficent?
+--------------------------------------------------------------------------------------------------------------------
+START MODEL WITH TASK & NOTIFICATION STRUCTURE & MULTI-CORE-BATCHING
+[50]:
+38 MATCHES
+49 X SIZE
+Reference Accuracy: 80.8 %
+Difference: -3.24898
+77.551,80.8,-3.24898
+TOTAL RUNTIME: 4490 ms
+Latency: 11.4541 [ms/elem]
+MAXIMUM HEAP USAGE: 231236 FREE BYTES
+[100]:
+77 MATCHES
+99 X SIZE
+Reference Accuracy: 80.8 %
+Difference: -3.02222
+77.7778,80.8,-3.02222
+TOTAL RUNTIME: 9622 ms
+Latency: 12.149 [ms/elem]
+MAXIMUM HEAP USAGE: 231240 FREE BYTES
+[200]:
+165 MATCHES
+199 X SIZE
+Reference Accuracy: 80.8 %
+Difference: 2.11457
+82.9146,80.8,2.11457
+TOTAL RUNTIME: 24082 ms
+Latency: 15.1269 [ms/elem]
+MAXIMUM HEAP USAGE: 231244 FREE BYTES
+[200]: 10 BATCHSIZE:
+165 MATCHES
+199 X SIZE
+Reference Accuracy: 80.8 %
+Difference: 2.11457
+82.9146,80.8,2.11457
+TOTAL RUNTIME: 19082 ms
+Latency: 11.9862 [ms/elem]
+MAXIMUM HEAP USAGE: 168972 FREE BYTES
+[200] 20 BATCHSIZE:
+165 MATCHES
+199 X SIZE
+Reference Accuracy: 80.8 %
+Difference: 2.11457
+82.9146,80.8,2.11457
+TOTAL RUNTIME: 18732 ms
+Latency: 11.7663 [ms/elem]
+MAXIMUM HEAP USAGE: 37728 FREE BYTES
+
+Reverse Task Creation:
+19752 ms
+Normal Task Creation:
+19082 ms
+--------------------------------------------------------------------------------------------------------------------
+-Probieren von Multi-Core-Batching mit Multithreading?
+-Gleichen Ansatz bei CNN probieren
+layer 15 - 13: ONE CORE:
+MAXIMUM HEAP USAGE: 55120 FREE BYTES
+layer 15 - 11: ONE CORE:
+MAXIMUM HEAP USAGE: 55304 FREE BYTES
+layer 15 - 9: ONE CORE:
+MAXIMUM HEAP USAGE: 55040 FREE BYTES
+layer 15 - 8: ONE CORE:
+
+130.856 BYTES FOR HEAP
+MAXIMUM HEAP USAGE: 57.452 FREE BYTES
+=ONE CNN MODEL WHICH IS NOT EVEN FULLY UTILIZNG THE HEAP USES
+73.404 BYTES FORM THE HEAP
+73.404 * 2 = 146.808 > 130.856  
+= 2 CORE AT THE SAME NOT POSSIBLE!
+
+---------------------------------------------------------------------------
+2 MODELS AT THE SAME TIME 
+2* begin_model_multi_core_batch:
+[50]: MODEL TASKS PINNED TO TASK CORE
+TOTAL RUNTIME OF BOTH MODELS: 8711 ms
+76 COMBINED MATCHES
+49 X SIZE
+
+FIRST MODEL:
+
+38 MATCHES
+49 X SIZE
+Reference Accuracy: 80.8 %
+Difference: -3.24898
+77.551,80.8,-3.24898
+TOTAL RUNTIME: 4986 ms
+Latency: 12.7194 [ms/elem]
+
+SECOND MODEL:
+
+38 MATCHES
+49 X SIZE
+Reference Accuracy: 80.8 %
+Difference: -3.24898
+77.551,80.8,-3.24898
+TOTAL RUNTIME: 8710 ms
+Latency: 22.2194 [ms/elem]
+MAXIMUM HEAP USAGE: 203320 FREE BYTES
+
+[100]: MODEL TASKS PINNED TO TASK CORE
+TOTAL RUNTIME OF BOTH MODELS: 18782 ms
+154 COMBINED MATCHES
+99 X SIZE
+
+FIRST MODEL:
+
+77 MATCHES
+99 X SIZE
+Reference Accuracy: 80.8 %
+Difference: -3.02222
+77.7778,80.8,-3.02222
+TOTAL RUNTIME: 11467 ms
+Latency: 14.4785 [ms/elem]
+
+SECOND MODEL:
+
+77 MATCHES
+99 X SIZE
+Reference Accuracy: 80.8 %
+Difference: -3.02222
+77.7778,80.8,-3.02222
+TOTAL RUNTIME: 18781 ms
+Latency: 23.7134 [ms/elem]
+MAXIMUM HEAP USAGE: 177560 FREE BYTES
+
+[100]: MODEL TASKS NOT PINNED TO TASK CORE:
+TOTAL RUNTIME OF BOTH MODELS: 20216 ms
+154 COMBINED MATCHES
+99 X SIZE
+
+FIRST MODEL:
+
+77 MATCHES
+99 X SIZE
+Reference Accuracy: 80.8 %
+Difference: -3.02222
+77.7778,80.8,-3.02222
+TOTAL RUNTIME: 20201 ms
+Latency: 25.5063 [ms/elem]
+
+SECOND MODEL:
+
+77 MATCHES
+99 X SIZE
+Reference Accuracy: 80.8 %
+Difference: -3.02222
+77.7778,80.8,-3.02222
+TOTAL RUNTIME: 20216 ms
+Latency: 25.5253 [ms/elem]
+MAXIMUM HEAP USAGE: 205952 FREE BYTES
+
+[100]: MODEL TASKS PINNED TO THE OPPOSITE CORES:
+TOTAL RUNTIME OF BOTH MODELS: 18792 ms
+154 COMBINED MATCHES
+99 X SIZE
+
+FIRST MODEL:
+
+77 MATCHES
+99 X SIZE
+Reference Accuracy: 80.8 %
+Difference: -3.02222
+77.7778,80.8,-3.02222
+TOTAL RUNTIME: 18792 ms
+Latency: 23.7273 [ms/elem]
+
+SECOND MODEL:
+
+77 MATCHES
+99 X SIZE
+Reference Accuracy: 80.8 %
+Difference: -3.02222
+77.7778,80.8,-3.02222
+TOTAL RUNTIME: 18790 ms
+Latency: 23.7247 [ms/elem]
+MAXIMUM HEAP USAGE: 247676 FREE BYTES
+
+[250]:
+TOTAL RUNTIME OF BOTH MODELS: 63361 ms
+412 COMBINED MATCHES
+249 X SIZE
+
+FIRST MODEL:
+
+206 MATCHES
+249 X SIZE
+Reference Accuracy: 80.8 %
+Difference: 1.93093
+82.7309,80.8,1.93093
+TOTAL RUNTIME: 63346 ms
+Latency: 31.8002 [ms/elem]
+
+SECOND MODEL:
+
+206 MATCHES
+249 X SIZE
+Reference Accuracy: 80.8 %
+Difference: 1.93093
+82.7309,80.8,1.93093
+TOTAL RUNTIME: 63361 ms
+Latency: 31.8077 [ms/elem]
+MAXIMUM HEAP USAGE: 205964 FREE BYTES
+
+[250]: MODEL TASKS PINNED TO TASK CORE:
+TOTAL RUNTIME OF BOTH MODELS: 58206 ms
+412 COMBINED MATCHES
+249 X SIZE
+
+FIRST MODEL:
+
+206 MATCHES
+249 X SIZE
+Reference Accuracy: 80.8 %
+Difference: 1.93093
+82.7309,80.8,1.93093
+TOTAL RUNTIME: 41371 ms
+Latency: 20.7686 [ms/elem]
+
+SECOND MODEL:
+
+206 MATCHES
+249 X SIZE
+Reference Accuracy: 80.8 %
+Difference: 1.93093
+82.7309,80.8,1.93093
+TOTAL RUNTIME: 58206 ms
+Latency: 29.2199 [ms/elem]
+MAXIMUM HEAP USAGE: 198748 FREE BYTES
+
+[250]: MODEL TASKS PINNED TO THE OPPOSITE CORES:
+TOTAL RUNTIME OF BOTH MODELS: 55056 ms
+412 COMBINED MATCHES
+249 X SIZE
+
+FIRST MODEL:
+
+206 MATCHES
+249 X SIZE
+Reference Accuracy: 80.8 %
+Difference: 1.93093
+82.7309,80.8,1.93093
+TOTAL RUNTIME: 55056 ms
+Latency: 27.6386 [ms/elem]
+
+SECOND MODEL:
+
+206 MATCHES
+249 X SIZE
+Reference Accuracy: 80.8 %
+Difference: 1.93093
+82.7309,80.8,1.93093
+TOTAL RUNTIME: 55034 ms
+Latency: 27.6275 [ms/elem]
+MAXIMUM HEAP USAGE: 205964 FREE BYTES
+
+-UNUSUAL BEHAVIOR WHEN TASKS PINNED TO TASK CORE?
+-SLOWEST WHEN ALL TASKS ARE JUST CREATED AND NOT PINNED TO EITHER CORE
+-HIGHEST HEAP USAGE WHEN TASKS PINNED TO TASK CORE
+	-HEAP USAGE VARIES A LOT -> TAKE MEDIAN
+-LOWEST HEAP USAGE WHEN TASKS PINNED TO OPPOSITE CORE
+
+10 BATCHSIZE:
+[250]: MODEL TASKS PINNED TO THE OPPOSITE CORES:
+TOTAL RUNTIME OF BOTH MODELS: 48501 ms
+FIRST MODEL:
+TOTAL RUNTIME: 48486 ms
+Latency: 24.3404 [ms/elem]
+SECOND MODEL:
+TOTAL RUNTIME: 48501 ms
+Latency: 24.3479 [ms/elem]
+MAXIMUM HEAP USAGE: 142948 FREE BYTES
+
+[250]: MODEL TASKS PINNED TO TASK CORES:
+TOTAL RUNTIME OF BOTH MODELS: 48696 ms
+FIRST MODEL:
+TOTAL RUNTIME: 30501 ms
+Latency: 15.3117 [ms/elem]
+SECOND MODEL:
+TOTAL RUNTIME: 48696 ms
+Latency: 24.4458 [ms/elem]
+MAXIMUM HEAP USAGE: 138208 FREE BYTES
+
+[250]: MODEL TASKS:
+TOTAL RUNTIME OF BOTH MODELS: 53421 ms
+FIRST MODEL:
+TOTAL RUNTIME: 53406 ms
+Latency: 26.8102 [ms/elem]
+SECOND MODEL:
+TOTAL RUNTIME: 53421 ms
+Latency: 26.8178 [ms/elem]
+MAXIMUM HEAP USAGE: 166200 FREE BYTES
+
+-PINNING TO EITHER CORE DOES BENEFIT THE EXECUTION, TRY IT OUT WITH THE NORMAL EXECUTION?
