@@ -185,7 +185,7 @@ namespace FAST_INFERENCE
     xSemaphoreGive(mutex);
     vTaskDelete(NULL);
   }
-  void predict_SimpleMLP152(double const *const x, double *pred)
+  void predict_SimpleMLP15(double const *const x, double *pred)
   {
     double layer_1_output[8];
     double layer_2_output[8];

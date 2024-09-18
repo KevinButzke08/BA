@@ -21,12 +21,6 @@ TaskHandle_t benchmarkTaskHandle1, benchmarkTaskHandle2;
 TaskHandle_t mainTaskHandle = NULL;
 unsigned matchesCore0 = 0;
 unsigned matchesCore1 = 0;
-
-unsigned int runtime_core0;
-unsigned int runtime_core1;
-float latency_core0;
-float latency_core1;
-
 struct TaskParams {
     unsigned int repeat;
 	unsigned int batchSize;
@@ -95,7 +89,6 @@ void read_csv(std::string &path, unsigned int batchingSize, unsigned lineNumber,
 	}
 }
 void benchmark(void *params) {
-	auto start = std::chrono::high_resolution_clock::now();
 	using namespace FAST_INFERENCE;
 	std::string path = std::string("/storage/testing.csv");
 	TaskParams *taskParams = static_cast<TaskParams*>(params);
@@ -105,7 +98,7 @@ void benchmark(void *params) {
 	double output[N_CLASSES];
 	std::vector<std::vector<double>> X;
     std::vector<unsigned int> Y;
-	for(int testDataLine = 2; testDataLine <= lineNumbers ; testDataLine += batchSize) {
+	for(int testDataLine = (lineNumbers/2 + 2); testDataLine <= (lineNumbers) ; testDataLine += batchSize) {
 		read_csv(path, batchSize, testDataLine, lineNumbers, X, Y);
 		unsigned int matches = 0;
     	for (unsigned int k = 0; k < repeat; ++k) {	
@@ -142,15 +135,11 @@ void benchmark(void *params) {
 	Y.shrink_to_fit();
 	std::cout << "BATCH DONE" << std::endl;
 	}
-	auto end = std::chrono::high_resolution_clock::now();
-	runtime_core0 = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
-	latency_core0 = static_cast<float>(std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count()) / ((lineNumbers-1) * repeat);
 	std::cout << "CORE 0 finished" << std::endl;
 	xTaskNotifyGive(mainTaskHandle);
 	vTaskDelete(NULL);
 }
 void benchmark2core(void *params) {
-	auto start = std::chrono::high_resolution_clock::now();
 	using namespace FAST_VARIANT;
 	std::string path = std::string("/storage/testing.csv");
 	TaskParams *taskParams = static_cast<TaskParams*>(params);
@@ -160,7 +149,7 @@ void benchmark2core(void *params) {
 	double output[N_CLASSES];
 	std::vector<std::vector<double>> X;
     std::vector<unsigned int> Y;
-	for(int testDataLine = 2; testDataLine <= lineNumbers; testDataLine += batchSize) {
+	for(int testDataLine = 2; testDataLine <= lineNumbers/2; testDataLine += batchSize) {
 		read_csv(path, batchSize, testDataLine, lineNumbers, X, Y);
 		unsigned int matches = 0;
     	for (unsigned int k = 0; k < repeat; ++k) {	
@@ -198,9 +187,6 @@ void benchmark2core(void *params) {
 	Y.shrink_to_fit();
 	std::cout << " CORE 1 BATCH DONE" << std::endl;
 	}
-	auto end = std::chrono::high_resolution_clock::now();
-	runtime_core1 = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
-	latency_core1 = static_cast<float>(std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count()) / ((lineNumbers-1) * repeat);
 	std::cout << "CORE 1 finished" << std::endl;
 	xTaskNotifyGive(mainTaskHandle);
 	vTaskDelete(NULL);
@@ -211,8 +197,8 @@ extern "C" void app_main(void){
 	std::cout << totalHeapAtStart << " BYTES FOR HEAP" << std::endl;
     std::string path = std::string("/storage/testing.csv");
     unsigned int repeat = 8;
-	unsigned int batchSize = 10;
-	unsigned int lineNumbers = 250;
+	unsigned int batchSize = 5;
+	unsigned int lineNumbers = 10;
 	unsigned int combinedMatches = 0;
     std::cout << "RUNNING BENCHMARK WITH " << repeat << " REPETITIONS" << std::endl;
 	TaskParams params1{repeat, batchSize, lineNumbers};
@@ -222,51 +208,29 @@ extern "C" void app_main(void){
 	xTaskCreatePinnedToCore(benchmark2core, "BenchmarkTask2", 6000, &params1, 1, &benchmarkTaskHandle2, 1);
 	ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 	ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-	auto end = std::chrono::high_resolution_clock::now();
-	std::cout << "TOTAL RUNTIME OF BOTH MODELS: " << std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count() << " ms" << std::endl;
 	combinedMatches = matchesCore0 + matchesCore1;
-	std::cout << combinedMatches << " COMBINED MATCHES" << std::endl;
+	auto end = std::chrono::high_resolution_clock::now();
+	std::cout << combinedMatches << " MATCHES" << std::endl;
 	std::cout << lineNumbers - 1 << " X SIZE" << std::endl;
-	auto accuracy = static_cast<float>(matchesCore0) / (lineNumbers - 1) * 100.f;
-	
-	std::cout << std::endl;
-	std::cout << "FIRST MODEL:" << std::endl;
-	std::cout << std::endl;
-	std::cout << matchesCore0 << " MATCHES" << std::endl;
-	std::cout << lineNumbers - 1 << " X SIZE" << std::endl;
+	auto accuracy = static_cast<float>(combinedMatches) / (lineNumbers - 1) * 100.f;
+
 	{
 		using namespace FAST_INFERENCE;
 	
-	
-	float difference = accuracy - REF_ACCURACY;
-	std::cout << "Reference Accuracy: " << REF_ACCURACY << " %" << std::endl;
-	std::cout << "Difference: " << difference << std::endl;
-	std::cout << accuracy << "," << REF_ACCURACY << "," << difference << std::endl;
-    
-	std::cout << "TOTAL RUNTIME: " << runtime_core0 << " ms" << std::endl;
-    std::cout << "Latency: " << latency_core0 << " [ms/elem]" << std::endl;
-	}
-
-	std::cout << std::endl;
-	std::cout << "SECOND MODEL:" << std::endl;
-	std::cout << std::endl;
-	std::cout << matchesCore1 << " MATCHES" << std::endl;
-	std::cout << lineNumbers - 1 << " X SIZE" << std::endl;
-	accuracy = static_cast<float>(matchesCore1) / (lineNumbers - 1) * 100.f;
-	{
-		using namespace FAST_VARIANT;
-	
-	
-	float difference = accuracy - REF_ACCURACY;
-	std::cout << "Reference Accuracy: " << REF_ACCURACY << " %" << std::endl;
-	std::cout << "Difference: " << difference << std::endl;
-	std::cout << accuracy << "," << REF_ACCURACY << "," << difference << std::endl;
-	
-	std::cout << "TOTAL RUNTIME: " << runtime_core1 << " ms" << std::endl;
-    std::cout << "Latency: " << latency_core1 << " [ms/elem]" << std::endl;
-	}
+	//#ifdef REF_ACCURACY
+		float difference = accuracy - REF_ACCURACY;
+		std::cout << "Reference Accuracy: " << REF_ACCURACY << " %" << std::endl;
+		std::cout << "Difference: " << difference << std::endl;
+		std::cout << accuracy << "," << REF_ACCURACY << "," << difference << std::endl;
+	//#else
+        //std::cout << accuracy << "," << "," << "," << results.second << std::endl;
+    //#endif
+    auto runtime = static_cast<float>(std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count()) / ((lineNumbers-1) * repeat);
+	std::cout << "TOTAL RUNTIME: " << std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count() << " ms" << std::endl;
+    std::cout << "Latency: " << runtime << " [ms/elem]" << std::endl;
 	size_t min_free_heap_size = xPortGetMinimumEverFreeHeapSize();
 	std::cout << "MAXIMUM HEAP USAGE: " << min_free_heap_size << " FREE BYTES" << std::endl;
+	}
 
 }
 

@@ -21,7 +21,17 @@ namespace FAST_INFERENCE
   static constexpr double layer_7_bias[15] = {0.38019034266471863, -0.04469812288880348, 0.0876205712556839, -0.036856409162282944, 0.04807894304394722, -0.051146313548088074, 0.3736222982406616, -0.01788305677473545, 0.12845826148986816, 0.06126205250620842, -0.180829718708992, -0.42653465270996094, -0.24686600267887115, -0.27782317996025085, -0.45406436920166016};
 
   TaskHandle_t layerTaskHandle = NULL;
-  
+  TaskHandle_t layer1handle, layer1core0handle, layer1core1handle, layer2handle, layer3handle, layer4handle, layer4core0handle, layer4core1handle, layer5handle, layer6handle, layer7handle, layer7core0handle, layer7core1handle, layer8handle;
+
+  static double layer_1_output[8];
+  static double layer_2_output[8];
+  static double layer_3_output[8];
+  static double layer_4_output[16];
+  static double layer_5_output[16];
+  static double layer_6_output[16];
+  static double layer_7_output[15];
+  static double layer_8_output[15];
+
   struct GemmTaskParams
   {
     unsigned int dp;
@@ -30,7 +40,6 @@ namespace FAST_INFERENCE
     double* output_1;
     const double* bias;
     const double* weight;
-    TaskHandle_t* taskHandels;
   };
   struct BatchnormalizationTaskParams 
   {
@@ -39,14 +48,12 @@ namespace FAST_INFERENCE
     double* output_1;
     const double* scale;
     const double* bias;
-    TaskHandle_t* taskHandels;
   };
   struct ReluTaskParams
   {
     unsigned int dp;
     double* output;
     double* output_1;
-    TaskHandle_t* taskHandels;
   };
   struct LogSoftmaxTaskParams
   {
@@ -54,23 +61,17 @@ namespace FAST_INFERENCE
     double* output;
     double* output_1;
     double *pred;
-    TaskHandle_t* taskHandels;
-    SemaphoreHandle_t mutex;
   };
 
-  void GemmTask(void *params)
+  SemaphoreHandle_t mutex;
+  SemaphoreHandle_t gemmTaskSemaphore;
+
+  void GemmTask_core0(void *params)
   {
     GemmTaskParams *taskParams = static_cast<GemmTaskParams *>(params);
     TaskHandle_t currentTaskHandle = xTaskGetCurrentTaskHandle();
-    TaskHandle_t* layerHandles = taskParams->taskHandels;
-    
-    if(currentTaskHandle == layerHandles[0]) {
-      //Wait for all Taskhandles to be not NULL
-      vTaskDelay(1);
-    }
-    else {
-      ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-    }
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+
     unsigned int dp = taskParams->dp;
     unsigned int ip = taskParams->ip;
     double *layer_p_output = taskParams->output;
@@ -78,12 +79,12 @@ namespace FAST_INFERENCE
     const double *layer_p_bias = taskParams->bias;
     const double *layer_p_weight = taskParams->weight;
     unsigned int weight_index = 0;
-    for (int d = 0; d < dp; d++)
+    for (int d = 0; d < (dp/2); d++)
     {
       layer_p_output[d] = layer_p_bias[d];
     }
 
-    for (int d = 0; d < dp; d++)
+    for (int d = 0; d < (dp/2); d++)
       {
         for (int i = 0; i < ip; i++)
         {
@@ -92,24 +93,81 @@ namespace FAST_INFERENCE
         }
       }
     
-    if(currentTaskHandle == layerHandles[0]) {
-      //printf("LAYER 1 FINISHED\n");
-      xTaskNotifyGive(layerHandles[1]);
-    }
-    else if(currentTaskHandle == layerHandles[3]) {
-      xTaskNotifyGive(layerHandles[4]);
-    }
-    else {
-      xTaskNotifyGive(layerHandles[7]);
-    }
+    xSemaphoreGive(gemmTaskSemaphore);
+    
     vTaskDelete(NULL);
   }
+  void GemmTask_core1(void *params)
+  {
+    GemmTaskParams *taskParams = static_cast<GemmTaskParams *>(params);
+    TaskHandle_t currentTaskHandle = xTaskGetCurrentTaskHandle();
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+
+    unsigned int dp = taskParams->dp;
+    unsigned int ip = taskParams->ip;
+    double *layer_p_output = taskParams->output;
+    double *layer_p_previous_output = taskParams->output_1;
+    const double *layer_p_bias = taskParams->bias;
+    const double *layer_p_weight = taskParams->weight;
+    unsigned int weight_index = 0;
+    for (int d = (dp/2); d < dp; d++)
+    {
+      layer_p_output[d] = layer_p_bias[d];
+    }
+
+    for (int d = (dp/2); d < dp; d++)
+      {
+        for (int i = 0; i < ip; i++)
+        {
+          weight_index = d * ip + i;
+          layer_p_output[d] += layer_p_weight[weight_index] * layer_p_previous_output[i];
+        }
+      }
+    
+    xSemaphoreGive(gemmTaskSemaphore);
+    
+    vTaskDelete(NULL);
+  }
+  void GemmTask(void *params)
+  {
+    TaskHandle_t currentTaskHandle = xTaskGetCurrentTaskHandle();
+    if(currentTaskHandle == layer1handle) {
+      //Wait for all Taskhandles to be not NULL
+      vTaskDelay(1);
+      xTaskNotifyGive(layer1core0handle);
+      xTaskNotifyGive(layer1core1handle);
+    }
+    else {
+      ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    }
+    if(currentTaskHandle == layer4handle) {
+      xTaskNotifyGive(layer4core0handle);
+      xTaskNotifyGive(layer4core1handle);
+    }
+    else if(currentTaskHandle == layer7handle) {
+      xTaskNotifyGive(layer7core0handle);
+      xTaskNotifyGive(layer7core1handle);
+    }
+    //PROBLEM ZONE!!!!!
+    xSemaphoreTake(gemmTaskSemaphore, portMAX_DELAY);
+    xSemaphoreTake(gemmTaskSemaphore, portMAX_DELAY);
+  
+    if(currentTaskHandle == layer1handle) {
+      xTaskNotifyGive(layer2handle);
+    }
+    else if(currentTaskHandle == layer4handle) {
+      xTaskNotifyGive(layer5handle);
+    }
+    else {
+      xTaskNotifyGive(layer8handle);
+    }
+    vTaskDelete(NULL);
+  } 
 
   void BatchNormalizationTask(void *params)
   {
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     BatchnormalizationTaskParams *taskParams = static_cast<BatchnormalizationTaskParams *>(params);
-    TaskHandle_t* layerHandles = taskParams->taskHandels;
     unsigned int dp = taskParams->dp;
     double *layer_p_output = taskParams->output;
     double *layer_p_previous_output = taskParams->output_1;
@@ -121,12 +179,11 @@ namespace FAST_INFERENCE
       layer_p_output[d] = layer_p_previous_output[d] * layer_p_scale[d] + layer_p_bias[d];
     }
     TaskHandle_t currentTaskHandle = xTaskGetCurrentTaskHandle();
-    if(currentTaskHandle == layerHandles[1]) {
-      //printf("LAYER 2 FINISHED\n");
-      xTaskNotifyGive(layerHandles[2]);
+    if(currentTaskHandle == layer2handle) {
+      xTaskNotifyGive(layer3handle);
     }
     else {
-      xTaskNotifyGive(layerHandles[5]);
+      xTaskNotifyGive(layer6handle);
     }
     vTaskDelete(NULL);
   }
@@ -135,7 +192,6 @@ namespace FAST_INFERENCE
   {
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     ReluTaskParams *taskParams = static_cast<ReluTaskParams *>(params);
-    TaskHandle_t* layerHandles = taskParams->taskHandels;
     unsigned int dp = taskParams->dp;
     double *layer_p_output = taskParams->output;
     double *layer_p_previous_output = taskParams->output_1;
@@ -145,11 +201,11 @@ namespace FAST_INFERENCE
       layer_p_output[d] = layer_p_previous_output[d] >= 0 ? layer_p_previous_output[d] : 0;
     }
     TaskHandle_t currentTaskHandle = xTaskGetCurrentTaskHandle();
-    if(currentTaskHandle == layerHandles[2]) {
-      xTaskNotifyGive(layerHandles[3]);
+    if(currentTaskHandle == layer3handle) {
+      xTaskNotifyGive(layer4handle);
     }
     else {
-      xTaskNotifyGive(layerHandles[6]);
+      xTaskNotifyGive(layer7handle);
     }
     vTaskDelete(NULL);
   }
@@ -162,7 +218,6 @@ namespace FAST_INFERENCE
     double *layer_p_output = taskParams->output;
     double *layer_p_previous_output = taskParams->output_1;
     double *pred = taskParams->pred;
-    SemaphoreHandle_t mutex = taskParams->mutex;
     double max = 0;
     for (int d = 0; d < dp; d++)
     {
@@ -185,41 +240,35 @@ namespace FAST_INFERENCE
     xSemaphoreGive(mutex);
     vTaskDelete(NULL);
   }
-  void predict_SimpleMLP152(double const *const x, double *pred)
+  void predict_SimpleMLP15(double const *const x, double *pred)
   {
-    double layer_1_output[8];
-    double layer_2_output[8];
-    double layer_3_output[8];
-    double layer_4_output[16];
-    double layer_5_output[16];
-    double layer_6_output[16];
-    double layer_7_output[15];
-    double layer_8_output[15];
-
-    TaskHandle_t layer1handle = NULL, layer2handle = NULL, layer3handle = NULL, layer4handle = NULL, layer5handle = NULL, layer6handle = NULL, layer7handle = NULL, layer8handle = NULL;
-    TaskHandle_t taskHandleArray[8] = {layer1handle, layer2handle, layer3handle, layer4handle, layer5handle, layer6handle, layer7handle, layer8handle}; 
-    SemaphoreHandle_t mutex = xSemaphoreCreateBinary();
-    
+    mutex = xSemaphoreCreateBinary();
+    gemmTaskSemaphore = xSemaphoreCreateCounting(2,0);
     auto layer_0_output = x;
-    GemmTaskParams layer1params{8, 784, layer_1_output, const_cast<double *>(layer_0_output), layer_1_bias, &layer_1_weight[0][0], taskHandleArray};
-    BatchnormalizationTaskParams layer2params{8, layer_2_output, layer_1_output, layer_2_scale, layer_2_bias, taskHandleArray};
-    ReluTaskParams layer3params{8, layer_3_output, layer_2_output, taskHandleArray};
-    GemmTaskParams layer4params{16, 8, layer_4_output, layer_3_output, layer_4_bias, &layer_4_weight[0][0], taskHandleArray};
-    BatchnormalizationTaskParams layer5params{16, layer_5_output, layer_4_output, layer_5_scale, layer_5_bias, taskHandleArray};
-    ReluTaskParams layer6params{16, layer_6_output, layer_5_output, taskHandleArray};
-    GemmTaskParams layer7params{15, 16, layer_7_output, layer_6_output, layer_7_bias, &layer_7_weight[0][0], taskHandleArray};
-    LogSoftmaxTaskParams layer8params{15, layer_8_output, layer_7_output, pred, taskHandleArray, mutex};
-    
-    xTaskCreate(GemmTask, "Layer1", 2048, &layer1params, 1, &taskHandleArray[0]);
-    xTaskCreate(BatchNormalizationTask, "Layer2", 4096, &layer2params, 1, &taskHandleArray[1]);
-    xTaskCreate(ReluTask, "Layer3", 2048, &layer3params, 1, &taskHandleArray[2]);
-    xTaskCreate(GemmTask, "Layer4", 2048, &layer4params, 1, &taskHandleArray[3]);
-    xTaskCreate(BatchNormalizationTask, "Layer5", 4096, &layer5params, 1, &taskHandleArray[4]);
-    xTaskCreate(ReluTask, "Layer6", 2048, &layer6params, 1, &taskHandleArray[5]);
-    xTaskCreate(GemmTask, "Layer7", 2048, &layer7params, 1, &taskHandleArray[6]);
-    xTaskCreate(LogSoftmaxTask, "Layer8", 2048, &layer8params, 1, &taskHandleArray[7]);
+    GemmTaskParams layer1params{8, 784, layer_1_output, const_cast<double *>(layer_0_output), layer_1_bias, &layer_1_weight[0][0]};
+    BatchnormalizationTaskParams layer2params{8, layer_2_output, layer_1_output, layer_2_scale, layer_2_bias};
+    ReluTaskParams layer3params{8, layer_3_output, layer_2_output};
+    GemmTaskParams layer4params{16, 8, layer_4_output, layer_3_output, layer_4_bias, &layer_4_weight[0][0]};
+    BatchnormalizationTaskParams layer5params{16, layer_5_output, layer_4_output, layer_5_scale, layer_5_bias};
+    ReluTaskParams layer6params{16, layer_6_output, layer_5_output};
+    GemmTaskParams layer7params{15, 16, layer_7_output, layer_6_output, layer_7_bias, &layer_7_weight[0][0]};
+    LogSoftmaxTaskParams layer8params{15, layer_8_output, layer_7_output, pred};
+    xTaskCreate(GemmTask, "Layer1", 1024, NULL, 1, &layer1handle);
+    xTaskCreatePinnedToCore(GemmTask_core0, "Layer1_core0", 2048, &layer1params, 1, &layer1core0handle, 0);
+    xTaskCreatePinnedToCore(GemmTask_core1, "Layer1_core1", 2048, &layer1params, 1, &layer1core1handle, 1);
+    xTaskCreate(BatchNormalizationTask, "Layer2", 4096, &layer2params, 1, &layer2handle);
+    xTaskCreate(ReluTask, "Layer3", 2048, &layer3params, 1, &layer3handle);
+    xTaskCreate(GemmTask, "Layer4", 1024, NULL, 1, &layer4handle);
+    xTaskCreatePinnedToCore(GemmTask_core0, "Layer4_core0", 2048, &layer4params, 1, &layer4core0handle, 0);
+    xTaskCreatePinnedToCore(GemmTask_core1, "Layer4_core1", 2048, &layer4params, 1, &layer4core1handle, 1);
+    xTaskCreate(BatchNormalizationTask, "Layer5", 4096, &layer5params, 1, &layer5handle);
+    xTaskCreate(ReluTask, "Layer6", 2048, &layer6params, 1, &layer6handle);
+    xTaskCreate(GemmTask, "Layer7", 1024, NULL, 1, &layer7handle);
+    xTaskCreatePinnedToCore(GemmTask_core0, "Layer7_core0", 2048, &layer7params, 1, &layer7core0handle, 0);
+    xTaskCreatePinnedToCore(GemmTask_core1, "Layer7_core1", 2048, &layer7params, 1, &layer7core1handle, 1);
+    xTaskCreate(LogSoftmaxTask, "Layer8", 2048, &layer8params, 1, &layer8handle);
     xSemaphoreTake(mutex, portMAX_DELAY);
-
     vSemaphoreDelete(mutex);
+    vSemaphoreDelete(gemmTaskSemaphore);
   }
 }
