@@ -950,3 +950,214 @@ Latency: 26.8178 [ms/elem]
 MAXIMUM HEAP USAGE: 166200 FREE BYTES
 
 -PINNING TO EITHER CORE DOES BENEFIT THE EXECUTION, TRY IT OUT WITH THE NORMAL EXECUTION?
+-PINNING AND SWITCH EVERY TASK TO ANOTHER CORE HAS THE SAME RUN TIME AS PINNING TO EITHER CORE => 48487 ms
+-Generating smaller binarized CNN
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+CNN NOTIFICATION MODEL
+[100]: TASKS JUST CREATED:
+62 MATCHES
+99 X SIZE
+Reference Accuracy: 70.84 %
+Difference: -8.21374
+62.6263,70.84,-8.21374
+TOTAL RUNTIME: 274.548 ms
+Latency: 346.652 [ms/elem]
+MAXIMUM HEAP USAGE: 52116 FREE BYTES
+
+[100]: TASKS PINNED TO CORES (1 - 0 -1 ...)
+62 MATCHES
+99 X SIZE
+Reference Accuracy: 70.84 %
+Difference: -8.21374
+62.6263,70.84,-8.21374
+TOTAL RUNTIME: 274.548 ms
+Latency: 346.652 [ms/elem]
+MAXIMUM HEAP USAGE: 53492 FREE BYTES
+[100]: TASKS PINNED TO ONLY ONE CORE:
+62 MATCHES
+99 X SIZE
+Reference Accuracy: 70.84 %
+Difference: -8.21374
+62.6263,70.84,-8.21374
+TOTAL RUNTIME: 277.273 ms
+Latency: 350.092 [ms/elem]
+MAXIMUM HEAP USAGE: 53480 FREE BYTES
+------------------------------------------------------------------------------------------------------------------------
+SMALLER CNN:
+[50]:
+27 MATCHES
+49 X SIZE
+Reference Accuracy: 64.4 %
+Difference: -9.29796
+55.102,64.4,-9.29796
+TOTAL RUNTIME: 62440 ms
+Latency: 159.286 [ms/elem]
+MAXIMUM HEAP USAGE: 145804 FREE BYTES
+
+[100]:
+63 MATCHES
+99 X SIZE
+Reference Accuracy: 64.4 %
+Difference: -0.763636
+63.6364,64.4,-0.763636
+TOTAL RUNTIME: 127.606 ms
+Latency: 161.119 [ms/elem]
+MAXIMUM HEAP USAGE: 145648 FREE BYTES
+------------------------------------------------------------------------------------------------------------------------
+SMALLER CNN WITH TASKS:
+[50]:
+27 MATCHES
+49 X SIZE
+Reference Accuracy: 64.4 %
+Difference: -9.29796
+55.102,64.4,-9.29796
+TOTAL RUNTIME: 71680 ms
+Latency: 182.857 [ms/elem]
+MAXIMUM HEAP USAGE: 134992 FREE BYTES
+
+[100]:
+63 MATCHES
+99 X SIZE
+Reference Accuracy: 64.4 %
+Difference: -0.763636
+63.6364,64.4,-0.763636
+TOTAL RUNTIME: 146.384 ms
+Latency: 184.828 [ms/elem]
+MAXIMUM HEAP USAGE: 134992 FREE BYTES
+-----------------------------------------------------------------------------------------------------------------------
+TODO:
+-Test Multi-core Batching VS Multithreading in layers with new small CNN
+-Test small CNN & small NN together with 3 different modes (TASKS PINNED TO TASK CORE, TASKS PINNED TO OPPOSITE CORE, TASKS CREATED)
+-----------------------------------------------------------------------------------------------------------------------
+[50]: SMALL CNN & SMALL NN Tasks just created
+TOTAL RUNTIME OF BOTH MODELS: 65476 ms
+65 COMBINED MATCHES
+49 X SIZE
+
+FIRST MODEL:
+
+27 MATCHES
+49 X SIZE
+Reference Accuracy: 64.4 %
+Difference: -9.29796
+55.102,64.4,-9.29796
+TOTAL RUNTIME: 65475 ms
+Latency: 167.028 [ms/elem]
+
+SECOND MODEL:
+
+38 MATCHES
+49 X SIZE
+Reference Accuracy: 80.8 %
+Difference: -3.24898
+77.551,80.8,-3.24898
+TOTAL RUNTIME: 4861 ms
+Latency: 12.4005 [ms/elem]
+MAXIMUM HEAP USAGE: 83676 FREE BYTES
+
+SMALL NN TASKS PINNEND TO TASK CORE:
+TOTAL RUNTIME OF BOTH MODELS: 62983 ms
+65 COMBINED MATCHES
+49 X SIZE
+
+FIRST MODEL:
+
+27 MATCHES
+49 X SIZE
+Reference Accuracy: 64.4 %
+Difference: -9.29796
+55.102,64.4,-9.29796
+TOTAL RUNTIME: 62983 ms
+Latency: 160.671 [ms/elem]
+
+SECOND MODEL:
+
+38 MATCHES
+49 X SIZE
+Reference Accuracy: 80.8 %
+Difference: -3.24898
+77.551,80.8,-3.24898
+TOTAL RUNTIME: 8746 ms
+Latency: 22.3112 [ms/elem]
+MAXIMUM HEAP USAGE: 86644 FREE BYTES
+----------------------------------------------------------------------------------------------------------
+SMALL TASK NN & SMALL TASK CNN
+CNN TASKS CREATED & NN TAKS PINNED TO TASK CORE
+[50]:
+TOTAL RUNTIME OF BOTH MODELS: 72291 ms
+65 COMBINED MATCHES
+49 X SIZE
+
+FIRST MODEL:
+
+27 MATCHES
+49 X SIZE
+Reference Accuracy: 64.4 %
+Difference: -9.29796
+55.102,64.4,-9.29796
+TOTAL RUNTIME: 72290 ms
+Latency: 184.413 [ms/elem]
+
+SECOND MODEL:
+
+38 MATCHES
+49 X SIZE
+Reference Accuracy: 80.8 %
+Difference: -3.24898
+77.551,80.8,-3.24898
+TOTAL RUNTIME: 15916 ms
+Latency: 40.602 [ms/elem]
+MAXIMUM HEAP USAGE: 53560 FREE BYTES
+
+TASKS PINNED TO TASK CORE:
+[50]:
+TOTAL RUNTIME OF BOTH MODELS: 72080 ms
+65 COMBINED MATCHES
+49 X SIZE
+
+FIRST MODEL:
+
+27 MATCHES
+49 X SIZE
+Reference Accuracy: 64.4 %
+Difference: -9.29796
+55.102,64.4,-9.29796
+TOTAL RUNTIME: 72080 ms
+Latency: 183.878 [ms/elem]
+
+SECOND MODEL:
+
+38 MATCHES
+49 X SIZE
+Reference Accuracy: 80.8 %
+Difference: -3.24898
+77.551,80.8,-3.24898
+TOTAL RUNTIME: 8746 ms
+Latency: 22.3112 [ms/elem]
+MAXIMUM HEAP USAGE: 53420 FREE BYTES
+[100]:
+TOTAL RUNTIME OF BOTH MODELS: 147814 ms
+140 COMBINED MATCHES
+99 X SIZE
+
+FIRST MODEL:
+
+63 MATCHES
+99 X SIZE
+Reference Accuracy: 64.4 %
+Difference: -0.763636
+63.6364,64.4,-0.763636
+TOTAL RUNTIME: 147.814 ms
+Latency: 186.634 [ms/elem]
+
+SECOND MODEL:
+
+77 MATCHES
+99 X SIZE
+Reference Accuracy: 80.8 %
+Difference: -3.02222
+77.7778,80.8,-3.02222
+TOTAL RUNTIME: 18566 ms
+Latency: 23.4419 [ms/elem]
+MAXIMUM HEAP USAGE: 45340 FREE BYTES
