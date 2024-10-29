@@ -53,8 +53,8 @@ struct MaxPoolTaskParams
   };
   struct GemmTaskParams
   {
-    unsigned int dp;
-    unsigned int ip;
+    unsigned int num_rows;
+    unsigned int num_columns;
     double* output;
     double* output_1;
     const double* bias;
@@ -76,7 +76,7 @@ struct MaxPoolTaskParams
   };
   struct BatchNormalization1DTaskParams
   {
-    unsigned int dp;
+    unsigned int num_rows;
     double* output;
     double* output_1;
     const double* scale;
@@ -84,7 +84,7 @@ struct MaxPoolTaskParams
   };
   struct BatchNormalization3DTaskParams
   {
-    unsigned int dp;
+    unsigned int num_rows;
     unsigned int wp;
     unsigned int cp;
     double* output;
@@ -108,7 +108,7 @@ struct MaxPoolTaskParams
   };
   struct LogSoftmaxTaskParams
   {
-    unsigned int dp;
+    unsigned int num_rows;
     double* output;
     double* output_1;
     double* pred;
@@ -170,13 +170,13 @@ struct MaxPoolTaskParams
   void BatchNormalization1DTask(void *params) {
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     BatchNormalization1DTaskParams *taskParams =  static_cast<BatchNormalization1DTaskParams *>(params);
-    unsigned int dp = taskParams->dp;
+    unsigned int num_rows = taskParams->num_rows;
     double *layer_p_output = taskParams->output;
     double *layer_p_previous_output = taskParams->output_1;
     const double *layer_p_scale = taskParams->scale;
     const double *layer_p_bias = taskParams->bias;
 
-    for (int d = 0; d < dp; d++) {
+    for (int d = 0; d < num_rows; d++) {
       layer_p_output[d] = layer_p_previous_output[d] * layer_p_scale[d] + layer_p_bias[d];
     }
     //printf("layer12 finished");
@@ -188,7 +188,7 @@ struct MaxPoolTaskParams
     TaskHandle_t currentTaskHandle = xTaskGetCurrentTaskHandle();
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     BatchNormalization3DTaskParams *taskParams = static_cast<BatchNormalization3DTaskParams *>(params);
-    unsigned int dp = taskParams->dp;
+    unsigned int num_rows = taskParams->num_rows;
     unsigned int wp = taskParams->wp;
     unsigned int cp = taskParams->cp;
     double *layer_p_output = taskParams->output;
@@ -196,7 +196,7 @@ struct MaxPoolTaskParams
     const double *layer_p_scale = taskParams->scale;
     const double *layer_p_bias = taskParams->bias;
 
-   for (int d = 0; d < dp; d++) {
+   for (int d = 0; d < num_rows; d++) {
       for (int w = 0; w < wp; w++) {
         for (int c = 0; c < cp; c++) {
           unsigned int layer_index = (d * wp * cp) + (w * cp) + c;
@@ -261,17 +261,17 @@ struct MaxPoolTaskParams
 void GemmTask(void *params) {
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     GemmTaskParams *taskParams = static_cast<GemmTaskParams *>(params);
-    unsigned int dp = taskParams->dp;
-    unsigned int ip = taskParams->ip;
+    unsigned int num_rows = taskParams->num_rows;
+    unsigned int ip = taskParams->num_columns;
     double *layer_p_output = taskParams->output;
     double *layer_p_previous_output = taskParams->output_1;
     const double *layer_p_bias = taskParams->bias;
     const double *layer_p_weight = taskParams->weight;
 
-    for (int d = 0; d < dp; d++) {
+    for (int d = 0; d < num_rows; d++) {
       layer_p_output[d] = layer_p_bias[d];
     }
-    for (int d = 0; d < dp; d++) {
+    for (int d = 0; d < num_rows; d++) {
       for (int i = 0; i < ip; i++) {
         int weightIndex = d * ip + i;
         layer_p_output[d] += layer_p_weight[weightIndex] * layer_p_previous_output[i];
@@ -343,26 +343,26 @@ void GemmTask(void *params) {
   void LogSoftmaxTask(void *params) {
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     LogSoftmaxTaskParams *taskParams = static_cast<LogSoftmaxTaskParams *>(params);
-    unsigned int dp = taskParams->dp;
+    unsigned int num_rows = taskParams->num_rows;
     double *layer_p_output = taskParams->output;
     double *layer_p_previous_output = taskParams->output_1;
     double *pred = taskParams->pred;
     double max = 0;
-    for (int d = 0; d < dp; d++)
+    for (int d = 0; d < num_rows; d++)
     {
       max = layer_p_previous_output[d] >= max ? layer_p_previous_output[d] : max;
     }
     double sum = 0;
-    for (int d = 0; d < dp; d++)
+    for (int d = 0; d < num_rows; d++)
     {
       layer_p_output[d] = std::exp(layer_p_previous_output[d] - max);
       sum += layer_p_output[d];
     }
-    for (int d = 0; d < dp; d++)
+    for (int d = 0; d < num_rows; d++)
     {
       layer_p_output[d] = std::log(layer_p_output[d] / sum);
     }
-    for (int i = 0; i < dp; i++)
+    for (int i = 0; i < num_rows; i++)
     {
       pred[i] += layer_p_output[i];
     }

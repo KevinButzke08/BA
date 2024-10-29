@@ -33,7 +33,7 @@ namespace FAST_INFERENCE
 
   struct TaskParams
   {
-    unsigned int dp;
+    unsigned int num_rows;
     unsigned int ip;
     double *bias;
     unsigned int weight;
@@ -48,14 +48,14 @@ namespace FAST_INFERENCE
   void GemmTask(void *params)
   {
     TaskParams *taskParams = static_cast<TaskParams *>(params);
-    unsigned int dp = taskParams->dp;
+    unsigned int num_rows = taskParams->num_rows;
     unsigned int ip = taskParams->ip;
     double *layer_p_bias = taskParams->bias;
     unsigned int layer_p_weight_index = taskParams->weight;
     double *layer_p_output = taskParams->output;
     double *layer_p_previous_output = taskParams->output_1;
 
-    for (int d = 0; d < dp; d++)
+    for (int d = 0; d < num_rows; d++)
     {
       layer_p_output[d] = layer_p_bias[d];
     }
@@ -63,7 +63,7 @@ namespace FAST_INFERENCE
     switch (layer_p_weight_index)
     {
     case 1:
-      for (int d = 0; d < dp; d++)
+      for (int d = 0; d < num_rows; d++)
       {
         for (int i = 0; i < ip; i++)
         {
@@ -72,7 +72,7 @@ namespace FAST_INFERENCE
       }
       break;
     case 4:
-      for (int d = 0; d < dp; d++)
+      for (int d = 0; d < num_rows; d++)
       {
         for (int i = 0; i < ip; i++)
         {
@@ -81,7 +81,7 @@ namespace FAST_INFERENCE
       }
       break;
     case 7:
-      for (int d = 0; d < dp; d++)
+      for (int d = 0; d < num_rows; d++)
       {
         for (int i = 0; i < ip; i++)
         {
@@ -97,12 +97,12 @@ namespace FAST_INFERENCE
   void BatchNormalizationTask(void *params)
   {
     TaskParams *taskParams = static_cast<TaskParams *>(params);
-    unsigned int dp = taskParams->dp;
+    unsigned int num_rows = taskParams->num_rows;
     double *layer_p_bias = taskParams->bias;
     double *layer_p_scale = taskParams->scale;
     double *layer_p_output = taskParams->output;
     double *layer_p_previous_output = taskParams->output_1;
-    for (int d = 0; d < dp; d++)
+    for (int d = 0; d < num_rows; d++)
     {
       layer_p_output[d] = layer_p_previous_output[d] * layer_p_scale[d] + layer_p_bias[d];
     }
@@ -113,10 +113,10 @@ namespace FAST_INFERENCE
   void ReluTask(void *params)
   {
     TaskParams *taskParams = static_cast<TaskParams *>(params);
-    unsigned int dp = taskParams->dp;
+    unsigned int num_rows = taskParams->num_rows;
     double *layer_p_output = taskParams->output;
     double *layer_p_previous_output = taskParams->output_1;
-    for (int d = 0; d < dp; d++)
+    for (int d = 0; d < num_rows; d++)
     {
       layer_p_output[d] = layer_p_previous_output[d] >= 0 ? layer_p_previous_output[d] : 0;
       
@@ -128,26 +128,26 @@ namespace FAST_INFERENCE
   void LogSoftmaxTask(void *params)
   {
     TaskParams *taskParams = static_cast<TaskParams *>(params);
-    unsigned int dp = taskParams->dp;
+    unsigned int num_rows = taskParams->num_rows;
     double *layer_p_output = taskParams->output;
     double *layer_p_previous_output = taskParams->output_1;
     double *pred = taskParams->pred;
     double max = 0;
-    for (int d = 0; d < dp; d++)
+    for (int d = 0; d < num_rows; d++)
     {
       max = layer_p_previous_output[d] >= max ? layer_p_previous_output[d] : max;
     }
     double sum = 0;
-    for (int d = 0; d < dp; d++)
+    for (int d = 0; d < num_rows; d++)
     {
       layer_p_output[d] = std::exp(layer_p_previous_output[d] - max);
       sum += layer_p_output[d];
     }
-    for (int d = 0; d < dp; d++)
+    for (int d = 0; d < num_rows; d++)
     {
       layer_p_output[d] = std::log(layer_p_output[d] / sum);
     }
-    for (int i = 0; i < dp; i++)
+    for (int i = 0; i < num_rows; i++)
     {
       pred[i] += layer_p_output[i];
     }

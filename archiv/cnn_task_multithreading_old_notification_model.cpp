@@ -56,8 +56,8 @@ struct MaxPoolTaskParams
   };
   struct GemmTaskParams
   {
-    unsigned int dp;
-    unsigned int ip;
+    unsigned int num_rows;
+    unsigned int num_columns;
     double* output;
     double* output_1;
     const double* bias;
@@ -79,7 +79,7 @@ struct MaxPoolTaskParams
   };
   struct BatchNormalization1DTaskParams
   {
-    unsigned int dp;
+    unsigned int num_rows;
     double* output;
     double* output_1;
     const double* scale;
@@ -87,7 +87,7 @@ struct MaxPoolTaskParams
   };
   struct BatchNormalization3DTaskParams
   {
-    unsigned int dp;
+    unsigned int num_rows;
     unsigned int wp;
     unsigned int cp;
     double* output;
@@ -111,14 +111,13 @@ struct MaxPoolTaskParams
   };
   struct LogSoftmaxTaskParams
   {
-    unsigned int dp;
+    unsigned int num_rows;
     double* output;
     double* output_1;
     double* pred;
     SemaphoreHandle_t mutex;
   };
   void ConvTaskCore0(void *params) {
-    TaskHandle_t currentTaskHandle = xTaskGetCurrentTaskHandle();
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     
     ConvTaskParams *taskParams = static_cast<ConvTaskParams *>(params);
@@ -158,7 +157,6 @@ struct MaxPoolTaskParams
     vTaskDelete(NULL);
   }
   void ConvTaskCore1(void *params) {
-    TaskHandle_t currentTaskHandle = xTaskGetCurrentTaskHandle();
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
     ConvTaskParams *taskParams = static_cast<ConvTaskParams *>(params);
@@ -227,13 +225,13 @@ struct MaxPoolTaskParams
   void BatchNormalization1DTask(void *params) {
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     BatchNormalization1DTaskParams *taskParams =  static_cast<BatchNormalization1DTaskParams *>(params);
-    unsigned int dp = taskParams->dp;
+    unsigned int num_rows = taskParams->num_rows;
     double *layer_p_output = taskParams->output;
     double *layer_p_previous_output = taskParams->output_1;
     const double *layer_p_scale = taskParams->scale;
     const double *layer_p_bias = taskParams->bias;
 
-    for (int d = 0; d < dp; d++) {
+    for (int d = 0; d < num_rows; d++) {
       layer_p_output[d] = layer_p_previous_output[d] * layer_p_scale[d] + layer_p_bias[d];
     }
     //printf("layer12 finished");
@@ -243,7 +241,7 @@ struct MaxPoolTaskParams
   void BatchNormalization3DTaskCore0(void *params) {
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     BatchNormalization3DTaskParams *taskParams = static_cast<BatchNormalization3DTaskParams *>(params);
-    unsigned int dp = taskParams->dp;
+    unsigned int num_rows = taskParams->num_rows;
     unsigned int wp = taskParams->wp;
     unsigned int cp = taskParams->cp;
     double *layer_p_output = taskParams->output;
@@ -251,7 +249,7 @@ struct MaxPoolTaskParams
     const double *layer_p_scale = taskParams->scale;
     const double *layer_p_bias = taskParams->bias;
 
-    for (int d = 0; d < (dp / 2); d++) {
+    for (int d = 0; d < (num_rows / 2); d++) {
       for (int w = 0; w < wp; w++) {
         for (int c = 0; c < cp; c++) {
           unsigned int layer_index = (d * wp * cp) + (w * cp) + c;
@@ -265,7 +263,7 @@ struct MaxPoolTaskParams
   void BatchNormalization3DTaskCore1(void *params) {
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     BatchNormalization3DTaskParams *taskParams = static_cast<BatchNormalization3DTaskParams *>(params);
-    unsigned int dp = taskParams->dp;
+    unsigned int num_rows = taskParams->num_rows;
     unsigned int wp = taskParams->wp;
     unsigned int cp = taskParams->cp;
     double *layer_p_output = taskParams->output;
@@ -273,7 +271,7 @@ struct MaxPoolTaskParams
     const double *layer_p_scale = taskParams->scale;
     const double *layer_p_bias = taskParams->bias;
 
-    for (int d = (dp / 2); d < dp; d++) {
+    for (int d = (num_rows / 2); d < num_rows; d++) {
       for (int w = 0; w < wp; w++) {
         for (int c = 0; c < cp; c++) {
           unsigned int layer_index = (d * wp * cp) + (w * cp) + c;
@@ -330,26 +328,15 @@ struct MaxPoolTaskParams
     TaskHandle_t currentTaskHandle = xTaskGetCurrentTaskHandle();
     Step3DTaskParams *taskParams =  static_cast<Step3DTaskParams *>(params);
     unsigned int hp = taskParams->hp;
-    unsigned int wp = taskParams->cp;
+    unsigned int wp = taskParams->wp;
     unsigned int cp = taskParams->cp;
     double *layer_p_output = taskParams->output;
     double *layer_p_previous_output = taskParams->output_1;
-    if(currentTaskHandle == layer4Handle) {
-      for (int h = 0; h < 26; h++) {
-        for (int w = 0; w < 26; w++) {
-          for (int c = 0; c < 12; c++) {
-            layer_4_output[h][w][c] = layer_3_output[h][w][c] > 0.0 ? 1.0 : -1.0;
-          }
-        }
-      }
-    }
-    else {
-      for (int h = 0; h < hp; h++) {
-        for (int w = 0; w < wp; w++) {
-          for (int c = 0; c < cp; c++) {
-            unsigned int layer_index = (h * wp * cp) + (w * cp) + c;
-            layer_p_output[layer_index] = layer_p_previous_output[layer_index] > 0.0 ? 1.0 : -1.0;
-          }
+    for (int h = 0; h < hp; h++) {
+      for (int w = 0; w < wp; w++) {
+        for (int c = 0; c < cp; c++) {
+          unsigned int layer_index = (h * wp * cp) + (w * cp) + c;
+          layer_p_output[layer_index] = layer_p_previous_output[layer_index] > 0.0 ? 1.0 : -1.0;
         }
       }
     }
@@ -367,17 +354,17 @@ struct MaxPoolTaskParams
 void GemmTask(void *params) {
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     GemmTaskParams *taskParams = static_cast<GemmTaskParams *>(params);
-    unsigned int dp = taskParams->dp;
-    unsigned int ip = taskParams->ip;
+    unsigned int num_rows = taskParams->num_rows;
+    unsigned int ip = taskParams->num_columns;
     double *layer_p_output = taskParams->output;
     double *layer_p_previous_output = taskParams->output_1;
     const double *layer_p_bias = taskParams->bias;
     const double *layer_p_weight = taskParams->weight;
 
-    for (int d = 0; d < dp; d++) {
+    for (int d = 0; d < num_rows; d++) {
       layer_p_output[d] = layer_p_bias[d];
     }
-    for (int d = 0; d < dp; d++) {
+    for (int d = 0; d < num_rows; d++) {
       for (int i = 0; i < ip; i++) {
         int weightIndex = d * ip + i;
         layer_p_output[d] += layer_p_weight[weightIndex] * layer_p_previous_output[i];
@@ -405,7 +392,6 @@ void GemmTask(void *params) {
     unsigned int prevWp = maxPoolTaskParams->prevWp;
     double* layer_p_output = maxPoolTaskParams->output;
     double* layer_p_previous_output = maxPoolTaskParams->output_1;
-    int output_1_index = maxPoolTaskParams->output_1_index;
     int p_output_index;
     int p_previous_output_index;
     for (int h = 0; h < hp; h++) {
@@ -442,26 +428,26 @@ void GemmTask(void *params) {
   void LogSoftmaxTask(void *params) {
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     LogSoftmaxTaskParams *taskParams = static_cast<LogSoftmaxTaskParams *>(params);
-    unsigned int dp = taskParams->dp;
+    unsigned int num_rows = taskParams->num_rows;
     double *layer_p_output = taskParams->output;
     double *layer_p_previous_output = taskParams->output_1;
     double *pred = taskParams->pred;
     double max = 0;
-    for (int d = 0; d < dp; d++)
+    for (int d = 0; d < num_rows; d++)
     {
       max = layer_p_previous_output[d] >= max ? layer_p_previous_output[d] : max;
     }
     double sum = 0;
-    for (int d = 0; d < dp; d++)
+    for (int d = 0; d < num_rows; d++)
     {
       layer_p_output[d] = std::exp(layer_p_previous_output[d] - max);
       sum += layer_p_output[d];
     }
-    for (int d = 0; d < dp; d++)
+    for (int d = 0; d < num_rows; d++)
     {
       layer_p_output[d] = std::log(layer_p_output[d] / sum);
     }
-    for (int i = 0; i < dp; i++)
+    for (int i = 0; i < num_rows; i++)
     {
       pred[i] += layer_p_output[i];
     }
@@ -498,7 +484,7 @@ void predict_SmallCnnActionBINARY5(double const * const x, double * pred) {
     xTaskCreate(Step3DTask, "Layer4", 2048, &layer4params, 1, &layer4Handle);
     xTaskCreate(MaxPoolTask, "Layer5", 2048, &layer5params, 1, &layer5Handle);
     xTaskCreate(ConvTask, "Layer6", 2000, NULL, 1, &layer6Handle);
-     xTaskCreatePinnedToCore(ConvTaskCore0, "ConvTaskCore0Layer6", 2000, &layer6params, 1, &layer6core0handle, 0);
+    xTaskCreatePinnedToCore(ConvTaskCore0, "ConvTaskCore0Layer6", 2000, &layer6params, 1, &layer6core0handle, 0);
     xTaskCreatePinnedToCore(ConvTaskCore1, "ConvTaskCore1Layer6", 2000, &layer6params, 1, &layer6core1handle, 1);
     xTaskCreate(BatchNormalization3DTask, "Layer7", 2000, NULL, 1, &layer7Handle);
     xTaskCreatePinnedToCore(BatchNormalization3DTaskCore0, "BatchNormalization3DTaskCore0Layer7", 2000, &layer7params, 1, &layer7core0handle, 0);

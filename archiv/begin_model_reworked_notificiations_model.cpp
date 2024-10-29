@@ -34,8 +34,8 @@ namespace FAST_INFERENCE
 
   struct GemmTaskParams
   {
-    unsigned int dp;
-    unsigned int ip;
+    unsigned int num_rows;
+    unsigned int num_columns;
     double* output;
     double* output_1;
     const double* bias;
@@ -43,7 +43,7 @@ namespace FAST_INFERENCE
   };
   struct BatchnormalizationTaskParams 
   {
-    unsigned int dp;
+    unsigned int num_rows;
     double* output;
     double* output_1;
     const double* scale;
@@ -51,13 +51,13 @@ namespace FAST_INFERENCE
   };
   struct ReluTaskParams
   {
-    unsigned int dp;
+    unsigned int num_rows;
     double* output;
     double* output_1;
   };
   struct LogSoftmaxTaskParams
   {
-    unsigned int dp;
+    unsigned int num_rows;
     double* output;
     double* output_1;
     double *pred;
@@ -76,19 +76,19 @@ namespace FAST_INFERENCE
     else {
       ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     }
-    unsigned int dp = taskParams->dp;
-    unsigned int ip = taskParams->ip;
+    unsigned int num_rows = taskParams->num_rows;
+    unsigned int ip = taskParams->num_columns;
     double *layer_p_output = taskParams->output;
     double *layer_p_previous_output = taskParams->output_1;
     const double *layer_p_bias = taskParams->bias;
     const double *layer_p_weight = taskParams->weight;
     unsigned int weight_index = 0;
-    for (int d = 0; d < dp; d++)
+    for (int d = 0; d < num_rows; d++)
     {
       layer_p_output[d] = layer_p_bias[d];
     }
 
-    for (int d = 0; d < dp; d++)
+    for (int d = 0; d < num_rows; d++)
       {
         for (int i = 0; i < ip; i++)
         {
@@ -113,13 +113,13 @@ namespace FAST_INFERENCE
   {
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     BatchnormalizationTaskParams *taskParams = static_cast<BatchnormalizationTaskParams *>(params);
-    unsigned int dp = taskParams->dp;
+    unsigned int num_rows = taskParams->num_rows;
     double *layer_p_output = taskParams->output;
     double *layer_p_previous_output = taskParams->output_1;
     const double *layer_p_scale = taskParams->scale;
     const double *layer_p_bias = taskParams->bias;
 
-    for (int d = 0; d < dp; d++)
+    for (int d = 0; d < num_rows; d++)
     {
       layer_p_output[d] = layer_p_previous_output[d] * layer_p_scale[d] + layer_p_bias[d];
     }
@@ -137,11 +137,11 @@ namespace FAST_INFERENCE
   {
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     ReluTaskParams *taskParams = static_cast<ReluTaskParams *>(params);
-    unsigned int dp = taskParams->dp;
+    unsigned int num_rows = taskParams->num_rows;
     double *layer_p_output = taskParams->output;
     double *layer_p_previous_output = taskParams->output_1;
 
-    for (int d = 0; d < dp; d++)
+    for (int d = 0; d < num_rows; d++)
     {
       layer_p_output[d] = layer_p_previous_output[d] >= 0 ? layer_p_previous_output[d] : 0;
     }
@@ -159,26 +159,26 @@ namespace FAST_INFERENCE
   {
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     LogSoftmaxTaskParams *taskParams = static_cast<LogSoftmaxTaskParams *>(params);
-    unsigned int dp = taskParams->dp;
+    unsigned int num_rows = taskParams->num_rows;
     double *layer_p_output = taskParams->output;
     double *layer_p_previous_output = taskParams->output_1;
     double *pred = taskParams->pred;
     double max = 0;
-    for (int d = 0; d < dp; d++)
+    for (int d = 0; d < num_rows; d++)
     {
       max = layer_p_previous_output[d] >= max ? layer_p_previous_output[d] : max;
     }
     double sum = 0;
-    for (int d = 0; d < dp; d++)
+    for (int d = 0; d < num_rows; d++)
     {
       layer_p_output[d] = std::exp(layer_p_previous_output[d] - max);
       sum += layer_p_output[d];
     }
-    for (int d = 0; d < dp; d++)
+    for (int d = 0; d < num_rows; d++)
     {
       layer_p_output[d] = std::log(layer_p_output[d] / sum);
     }
-    for (int i = 0; i < dp; i++)
+    for (int i = 0; i < num_rows; i++)
     {
       pred[i] += layer_p_output[i];
     }
