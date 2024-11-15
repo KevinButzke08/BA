@@ -20,9 +20,6 @@ namespace FAST_INFERENCE
   static constexpr double layer_7_weight[15][16] = {{0.5934959053993225, 0.5070686340332031, -0.206968292593956, -0.43848174810409546, 0.3289050757884979, -0.2803991138935089, 0.3511415123939514, -0.38962864875793457, -0.16231119632720947, -0.27799710631370544, 0.05966826155781746, -0.17941004037857056, -0.6428348422050476, -0.5088551044464111, -0.20199209451675415, -0.22855646908283234}, {0.24991212785243988, 0.2717830240726471, 0.05994206666946411, -0.1480945199728012, -0.43938183784484863, 0.6388981938362122, -0.5621329545974731, -0.4486701786518097, -0.5590690970420837, -0.14188480377197266, -0.3535028398036957, -0.22826579213142395, 0.38060134649276733, 0.47125405073165894, -0.6074155569076538, -0.519505500793457}, {-0.5687803626060486, 0.3977144956588745, -0.4335806369781494, 0.30723249912261963, 0.6046174764633179, -0.2622891366481781, -0.3486807942390442, -0.1551947146654129, -0.0795947015285492, 0.0028549653943628073, -0.28943052887916565, -0.5368087887763977, 0.47237029671669006, -0.255644828081131, 0.320872962474823, -0.17918118834495544}, {0.4956870675086975, 0.21057318150997162, 0.2759888470172882, -0.2629690170288086, -0.2702290415763855, -0.22038237750530243, 0.44887563586235046, -0.30627143383026123, -0.3145318925380707, -0.18174965679645538, -0.5831788182258606, 0.08748722076416016, 0.5366833806037903, -0.43692269921302795, -0.3183901011943817, -0.3909277617931366}, {-0.37620851397514343, 0.25518128275871277, -0.18493402004241943, 0.6547581553459167, -0.043982136994600296, -0.04441018030047417, 0.4353286325931549, -0.447322279214859, -0.49993541836738586, 0.39167118072509766, -0.6072788834571838, -0.33468350768089294, -0.13230746984481812, 0.03498661890625954, 0.2521851062774658, -0.4151606559753418}, {-0.005202431231737137, -0.7027269005775452, 0.4648805856704712, -0.5535784959793091, -0.29919832944869995, -0.1391574889421463, -0.061505209654569626, 0.3050101101398468, 0.5256165266036987, -0.25353124737739563, -0.1380445957183838, -0.16197019815444946, -0.4245397448539734, 0.39253079891204834, -0.44644373655319214, 0.4478214681148529}, {-0.09800583124160767, 0.31779173016548157, -0.3188547194004059, 0.1441904902458191, 0.5424817800521851, -0.5712652206420898, 0.5531786680221558, -0.6628810167312622, 0.0478639155626297, -0.011007202789187431, -0.3591035306453705, -0.3993067145347595, -0.33385804295539856, -0.08139673620462418, -0.28720623254776, 0.2772062420845032}, {-0.41112571954727173, -0.6709508299827576, 0.16960829496383667, -0.2983361482620239, 0.38551273941993713, 0.4666627049446106, -0.6114271283149719, 0.4176865518093109, 0.12502136826515198, -0.42562395334243774, 0.5089156031608582, -0.2799501121044159, -0.5026248693466187, -0.0881844237446785, 0.09085922688245773, -0.4779369831085205}, {-0.06972118467092514, -0.4247781038284302, 0.09157996624708176, 0.4872186779975891, -0.40153968334198, -0.34508442878723145, -0.2829413414001465, -0.6760725378990173, 0.3207697570323944, -0.005250932183116674, -0.154836967587471, 0.23938077688217163, -0.36364275217056274, -0.38283348083496094, 0.42680564522743225, 0.5494261980056763}, {-0.416242778301239, -0.5275061130523682, -0.5615103840827942, -0.5055899620056152, -0.2449202984571457, -0.023807773366570473, -0.129648357629776, 0.48648154735565186, 0.32212355732917786, 0.3705328404903412, 0.08067750930786133, 0.4051567614078522, -0.3004121482372284, -0.310851126909256, 0.19698187708854675, -0.28619077801704407}, {-0.3035855293273926, -0.5001047849655151, -0.28206953406333923, -0.3599138855934143, -0.1641181856393814, -0.07594870030879974, -0.302188515663147, -0.23944109678268433, -0.401682585477829, -0.3762173056602478, -0.47363561391830444, -0.2113746702671051, -0.47409588098526, -0.4553351402282715, -0.38458770513534546, -0.414283812046051}, {-0.187661811709404, -0.1121687963604927, -0.36879196763038635, -0.1762552559375763, -0.40911081433296204, -0.5100489258766174, -0.21206055581569672, -0.08880259841680527, -0.44648563861846924, -0.21019449830055237, -0.18970568478107452, -0.21512176096439362, -0.3964850902557373, -0.12966138124465942, -0.3591794967651367, -0.25682464241981506}, {-0.4316006600856781, -0.11670365929603577, -0.11155835539102554, -0.21888741850852966, -0.19406110048294067, -0.09311278164386749, -0.26540419459342957, -0.1407417505979538, -0.15328045189380646, -0.12081582099199295, -0.37565523386001587, -0.2536942958831787, -0.42523354291915894, -0.41569817066192627, -0.08676455169916153, -0.3778783977031708}, {-0.31441792845726013, -0.21398897469043732, -0.3663623631000519, -0.0701049268245697, -0.43118035793304443, -0.2564701437950134, -0.5046785473823547, -0.07346323132514954, -0.03686860203742981, -0.4157683849334717, -0.21512363851070404, -0.13633118569850922, -0.25274524092674255, -0.39176496863365173, -0.35382530093193054, -0.32502177357673645}, {-0.4801475405693054, -0.14924080669879913, -0.14031073451042175, -0.1733962446451187, -0.3225332498550415, -0.11845088005065918, -0.22123728692531586, -0.11794928461313248, -0.41793370246887207, -0.18951691687107086, -0.27190983295440674, -0.4745544493198395, -0.13702940940856934, -0.14491486549377441, -0.2968488335609436, -0.24645130336284637}};
   static constexpr double layer_7_bias[15] = {0.38019034266471863, -0.04469812288880348, 0.0876205712556839, -0.036856409162282944, 0.04807894304394722, -0.051146313548088074, 0.3736222982406616, -0.01788305677473545, 0.12845826148986816, 0.06126205250620842, -0.180829718708992, -0.42653465270996094, -0.24686600267887115, -0.27782317996025085, -0.45406436920166016};
 
-  TaskHandle_t layerTaskHandle = NULL;
-  TaskHandle_t layer1handle, layer2handle, layer3handle, layer4handle, layer5handle, layer6handle, layer7handle, layer8handle;
-
   static double layer_1_output[8];
   static double layer_2_output[8];
   static double layer_3_output[8];
@@ -31,6 +28,8 @@ namespace FAST_INFERENCE
   static double layer_6_output[16];
   static double layer_7_output[15];
   static double layer_8_output[15];
+
+  TaskHandle_t mainTaskHandle = NULL;
 
   struct GemmTaskParams
   {
@@ -68,14 +67,7 @@ namespace FAST_INFERENCE
   void GemmTask(void *params)
   {
     GemmTaskParams *taskParams = static_cast<GemmTaskParams *>(params);
-    TaskHandle_t currentTaskHandle = xTaskGetCurrentTaskHandle();
-    if(currentTaskHandle == layer1handle) {
-      //Wait for all Taskhandles to be not NULL
-      vTaskDelay(1);
-    }
-    else {
-      ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-    }
+   
     unsigned int num_rows = taskParams->num_rows;
     unsigned int ip = taskParams->num_columns;
     double *layer_p_output = taskParams->output;
@@ -87,7 +79,6 @@ namespace FAST_INFERENCE
     {
       layer_p_output[d] = layer_p_bias[d];
     }
-
     for (int d = 0; d < num_rows; d++)
       {
         for (int i = 0; i < ip; i++)
@@ -96,22 +87,12 @@ namespace FAST_INFERENCE
           layer_p_output[d] += layer_p_weight[weight_index] * layer_p_previous_output[i];
         }
       }
-
-    if(currentTaskHandle == layer1handle) {
-      xTaskNotifyGive(layer2handle);
-    }
-    else if(currentTaskHandle == layer4handle) {
-      xTaskNotifyGive(layer5handle);
-    }
-    else {
-      xTaskNotifyGive(layer8handle);
-    }
+    xTaskNotifyGive(mainTaskHandle);
     vTaskDelete(NULL);
   }
 
   void BatchNormalizationTask(void *params)
   {
-    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     BatchnormalizationTaskParams *taskParams = static_cast<BatchnormalizationTaskParams *>(params);
     unsigned int num_rows = taskParams->num_rows;
     double *layer_p_output = taskParams->output;
@@ -123,19 +104,12 @@ namespace FAST_INFERENCE
     {
       layer_p_output[d] = layer_p_previous_output[d] * layer_p_scale[d] + layer_p_bias[d];
     }
-    TaskHandle_t currentTaskHandle = xTaskGetCurrentTaskHandle();
-    if(currentTaskHandle == layer2handle) {
-      xTaskNotifyGive(layer3handle);
-    }
-    else {
-      xTaskNotifyGive(layer6handle);
-    }
+    xTaskNotifyGive(mainTaskHandle);
     vTaskDelete(NULL);
   }
 
   void ReluTask(void *params)
   {
-    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     ReluTaskParams *taskParams = static_cast<ReluTaskParams *>(params);
     unsigned int num_rows = taskParams->num_rows;
     double *layer_p_output = taskParams->output;
@@ -145,19 +119,12 @@ namespace FAST_INFERENCE
     {
       layer_p_output[d] = layer_p_previous_output[d] >= 0 ? layer_p_previous_output[d] : 0;
     }
-    TaskHandle_t currentTaskHandle = xTaskGetCurrentTaskHandle();
-    if(currentTaskHandle == layer3handle) {
-      xTaskNotifyGive(layer4handle);
-    }
-    else {
-      xTaskNotifyGive(layer7handle);
-    }
+    xTaskNotifyGive(mainTaskHandle);
     vTaskDelete(NULL);
   }
 
   void LogSoftmaxTask(void *params)
   {
-    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     LogSoftmaxTaskParams *taskParams = static_cast<LogSoftmaxTaskParams *>(params);
     unsigned int num_rows = taskParams->num_rows;
     double *layer_p_output = taskParams->output;
@@ -182,13 +149,12 @@ namespace FAST_INFERENCE
     {
       pred[i] += layer_p_output[i];
     }
-    xSemaphoreGive(mutex);
+    xTaskNotifyGive(mainTaskHandle);
     vTaskDelete(NULL);
   }
   void predict_SimpleMLP15(double const *const x, double *pred)
   {
-    mutex = xSemaphoreCreateBinary();
-
+    mainTaskHandle = xTaskGetCurrentTaskHandle();
     auto layer_0_output = x;
     GemmTaskParams layer1params{8, 784, layer_1_output, const_cast<double *>(layer_0_output), layer_1_bias, &layer_1_weight[0][0]};
     BatchnormalizationTaskParams layer2params{8, layer_2_output, layer_1_output, layer_2_scale, layer_2_bias};
@@ -199,15 +165,21 @@ namespace FAST_INFERENCE
     GemmTaskParams layer7params{15, 16, layer_7_output, layer_6_output, layer_7_bias, &layer_7_weight[0][0]};
     LogSoftmaxTaskParams layer8params{15, layer_8_output, layer_7_output, pred};
     
-    xTaskCreate(GemmTask, "Layer1", 2048, &layer1params, 1, &layer1handle);
-    xTaskCreate(BatchNormalizationTask, "Layer2", 2048, &layer2params, 1, &layer2handle);
-    xTaskCreate(ReluTask, "Layer3", 2048, &layer3params, 1, &layer3handle);
-    xTaskCreate(GemmTask, "Layer4", 2048, &layer4params, 1, &layer4handle);
-    xTaskCreate(BatchNormalizationTask, "Layer5", 2048, &layer5params, 1, &layer5handle);
-    xTaskCreate(ReluTask, "Layer6", 2048, &layer6params, 1, &layer6handle);
-    xTaskCreate(GemmTask, "Layer7", 2048, &layer7params, 1, &layer7handle);
-    xTaskCreate(LogSoftmaxTask, "Layer8", 2048, &layer8params, 1, &layer8handle);
-    xSemaphoreTake(mutex, portMAX_DELAY);
-    vSemaphoreDelete(mutex);
+    xTaskCreate(GemmTask, "Layer1", 2048, &layer1params, 1, NULL);
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    xTaskCreate(BatchNormalizationTask, "Layer2", 2048, &layer2params, 1, NULL);
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    xTaskCreate(ReluTask, "Layer3", 2048, &layer3params, 1, NULL);
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    xTaskCreate(GemmTask, "Layer4", 2048, &layer4params, 1, NULL);
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    xTaskCreate(BatchNormalizationTask, "Layer5", 2048, &layer5params, 1, NULL);
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    xTaskCreate(ReluTask, "Layer6", 2048, &layer6params, 1, NULL);
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    xTaskCreate(GemmTask, "Layer7", 2048, &layer7params, 1, NULL);
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    xTaskCreate(LogSoftmaxTask, "Layer8", 2048, &layer8params, 1, NULL);
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
   }
 }

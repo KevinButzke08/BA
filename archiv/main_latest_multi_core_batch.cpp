@@ -114,7 +114,7 @@ void benchmark(void *params) {
 	        	std::fill(output, output+N_CLASSES, 0);
 	        	unsigned int label = Y[i];
 				double const * const x = &X[i][0];
-				predict_SmallCnnActionBINARY8(x, output);
+				predict_SimpleMLP15(x, output);
 				if constexpr (N_CLASSES >= 2) {
 					double max = output[0];
 					unsigned int argmax = 0;
@@ -151,30 +151,30 @@ void benchmark(void *params) {
 }
 void benchmark2core(void *params) {
 	auto start = std::chrono::high_resolution_clock::now();
-	using namespace FAST_VARIANT;
+	using namespace FAST_INFERENCE;
 	std::string path = std::string("/storage/testing.csv");
 	TaskParams *taskParams = static_cast<TaskParams*>(params);
 	unsigned int batchSize = taskParams->batchSize;
 	unsigned int repeat = taskParams->repeat;
 	unsigned int lineNumbers = taskParams->lineNumbers;
-	double output[N_CLASSES_Variant];
+	double output[N_CLASSES];
 	std::vector<std::vector<double>> X;
     std::vector<unsigned int> Y;
-	for(int testDataLine = 2; testDataLine <= lineNumbers; testDataLine += batchSize) {
+	for(int testDataLine = lineNumbers/2+2; testDataLine <= lineNumbers; testDataLine += batchSize) {
 		read_csv(path, batchSize, testDataLine, lineNumbers, X, Y);
 		unsigned int matches = 0;
     	for (unsigned int k = 0; k < repeat; ++k) {	
     		matches = 0;
 			//std::cout << "CORE 1 EXECUTING" << std::endl;
 	    	for (unsigned int i = 0; i < X.size(); ++i) {
-	        	std::fill(output, output+N_CLASSES_Variant, 0);
+	        	std::fill(output, output+N_CLASSES, 0);
 	        	unsigned int label = Y[i];
 				double const * const x = &X[i][0];
-				predict_SimpleMLP152(x, output);
-				if constexpr (N_CLASSES_Variant >= 2) {
+				predict_SimpleMLP15(x, output);
+				if constexpr (N_CLASSES >= 2) {
 					double max = output[0];
 					unsigned int argmax = 0;
-					for (unsigned int j = 1; j < N_CLASSES_Variant; j++) {
+					for (unsigned int j = 1; j < N_CLASSES; j++) {
 						if (output[j] > max) {
 							max = output[j];
 							argmax = j;
@@ -218,11 +218,11 @@ extern "C" void app_main(void){
 	TaskParams params1{repeat, batchSize, lineNumbers};
 	mainTaskHandle = xTaskGetCurrentTaskHandle();
 	auto start = std::chrono::high_resolution_clock::now();
-	//xTaskCreate(benchmark, "BenchmarkTask1", 5000, &params1, 1, &benchmarkTaskHandle1);
-	xTaskCreatePinnedToCore(benchmark, "BenchmarkTask1", 5000, &params1, 1, &benchmarkTaskHandle1, 0);
-	xTaskCreatePinnedToCore(benchmark2core, "BenchmarkTask2", 5000, &params1, 1, &benchmarkTaskHandle2, 1);
+	xTaskCreate(benchmark, "BenchmarkTask1", 8000, &params1, 1, &benchmarkTaskHandle1);
+	//xTaskCreatePinnedToCore(benchmark, "BenchmarkTask1", 8000, &params1, 1, &benchmarkTaskHandle1, 0);
+	//xTaskCreatePinnedToCore(benchmark2core, "BenchmarkTask2", 5000, &params1, 1, &benchmarkTaskHandle2, 1);
 	ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-	ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+	//ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 	auto end = std::chrono::high_resolution_clock::now();
 	std::cout << "TOTAL RUNTIME OF BOTH MODELS: " << std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count() << " ms" << std::endl;
 	combinedMatches = matchesCore0 + matchesCore1;
@@ -258,10 +258,10 @@ extern "C" void app_main(void){
 		using namespace FAST_VARIANT;
 	
 	
-	float difference = accuracy - REF_ACCURACY_Variant;
-	std::cout << "Reference Accuracy: " << REF_ACCURACY_Variant << " %" << std::endl;
+	float difference = accuracy - REF_ACCURACY;
+	std::cout << "Reference Accuracy: " << REF_ACCURACY << " %" << std::endl;
 	std::cout << "Difference: " << difference << std::endl;
-	std::cout << accuracy << "," << REF_ACCURACY_Variant << "," << difference << std::endl;
+	std::cout << accuracy << "," << REF_ACCURACY << "," << difference << std::endl;
 	
 	std::cout << "TOTAL RUNTIME: " << runtime_core1 << " ms" << std::endl;
     std::cout << "Latency: " << latency_core1 << " [ms/elem]" << std::endl;

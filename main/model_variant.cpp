@@ -24,7 +24,7 @@ namespace FAST_VARIANT
   
   struct GemmTaskParams
   {
-    unsigned int dp;
+    unsigned int num_rows;
     unsigned int ip;
     double* output;
     double* output_1;
@@ -34,7 +34,7 @@ namespace FAST_VARIANT
   };
   struct BatchnormalizationTaskParams 
   {
-    unsigned int dp;
+    unsigned int num_rows;
     double* output;
     double* output_1;
     const double* scale;
@@ -43,14 +43,14 @@ namespace FAST_VARIANT
   };
   struct ReluTaskParams
   {
-    unsigned int dp;
+    unsigned int num_rows;
     double* output;
     double* output_1;
     TaskHandle_t* taskHandels;
   };
   struct LogSoftmaxTaskParams
   {
-    unsigned int dp;
+    unsigned int num_rows;
     double* output;
     double* output_1;
     double *pred;
@@ -58,7 +58,7 @@ namespace FAST_VARIANT
     SemaphoreHandle_t mutex;
   };
 
-  void GemmTask(void *params)
+  void GemmTask_Variant(void *params)
   {
     GemmTaskParams *taskParams = static_cast<GemmTaskParams *>(params);
     TaskHandle_t currentTaskHandle = xTaskGetCurrentTaskHandle();
@@ -71,19 +71,19 @@ namespace FAST_VARIANT
     else {
       ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     }
-    unsigned int dp = taskParams->dp;
+    unsigned int num_rows = taskParams->num_rows;
     unsigned int ip = taskParams->ip;
     double *layer_p_output = taskParams->output;
     double *layer_p_previous_output = taskParams->output_1;
     const double *layer_p_bias = taskParams->bias;
     const double *layer_p_weight = taskParams->weight;
     unsigned int weight_index = 0;
-    for (int d = 0; d < dp; d++)
+    for (int d = 0; d < num_rows; d++)
     {
       layer_p_output[d] = layer_p_bias[d];
     }
 
-    for (int d = 0; d < dp; d++)
+    for (int d = 0; d < num_rows; d++)
       {
         for (int i = 0; i < ip; i++)
         {
@@ -105,18 +105,18 @@ namespace FAST_VARIANT
     vTaskDelete(NULL);
   }
 
-  void BatchNormalizationTask(void *params)
+  void BatchNormalizationTask_Variant(void *params)
   {
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     BatchnormalizationTaskParams *taskParams = static_cast<BatchnormalizationTaskParams *>(params);
     TaskHandle_t* layerHandles = taskParams->taskHandels;
-    unsigned int dp = taskParams->dp;
+    unsigned int num_rows = taskParams->num_rows;
     double *layer_p_output = taskParams->output;
     double *layer_p_previous_output = taskParams->output_1;
     const double *layer_p_scale = taskParams->scale;
     const double *layer_p_bias = taskParams->bias;
 
-    for (int d = 0; d < dp; d++)
+    for (int d = 0; d < num_rows; d++)
     {
       layer_p_output[d] = layer_p_previous_output[d] * layer_p_scale[d] + layer_p_bias[d];
     }
@@ -136,11 +136,11 @@ namespace FAST_VARIANT
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     ReluTaskParams *taskParams = static_cast<ReluTaskParams *>(params);
     TaskHandle_t* layerHandles = taskParams->taskHandels;
-    unsigned int dp = taskParams->dp;
+    unsigned int num_rows = taskParams->num_rows;
     double *layer_p_output = taskParams->output;
     double *layer_p_previous_output = taskParams->output_1;
 
-    for (int d = 0; d < dp; d++)
+    for (int d = 0; d < num_rows; d++)
     {
       layer_p_output[d] = layer_p_previous_output[d] >= 0 ? layer_p_previous_output[d] : 0;
     }
@@ -158,34 +158,34 @@ namespace FAST_VARIANT
   {
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     LogSoftmaxTaskParams *taskParams = static_cast<LogSoftmaxTaskParams *>(params);
-    unsigned int dp = taskParams->dp;
+    unsigned int num_rows = taskParams->num_rows;
     double *layer_p_output = taskParams->output;
     double *layer_p_previous_output = taskParams->output_1;
     double *pred = taskParams->pred;
     SemaphoreHandle_t mutex = taskParams->mutex;
     double max = 0;
-    for (int d = 0; d < dp; d++)
+    for (int d = 0; d < num_rows; d++)
     {
       max = layer_p_previous_output[d] >= max ? layer_p_previous_output[d] : max;
     }
     double sum = 0;
-    for (int d = 0; d < dp; d++)
+    for (int d = 0; d < num_rows; d++)
     {
       layer_p_output[d] = std::exp(layer_p_previous_output[d] - max);
       sum += layer_p_output[d];
     }
-    for (int d = 0; d < dp; d++)
+    for (int d = 0; d < num_rows; d++)
     {
       layer_p_output[d] = std::log(layer_p_output[d] / sum);
     }
-    for (int i = 0; i < dp; i++)
+    for (int i = 0; i < num_rows; i++)
     {
       pred[i] += layer_p_output[i];
     }
     xSemaphoreGive(mutex);
     vTaskDelete(NULL);
   }
-  void predict_SimpleMLP15(double const *const x, double *pred)
+  void predict_SimpleMLP152(double const *const x, double *pred)
   {
     double layer_1_output[8];
     double layer_2_output[8];
@@ -209,15 +209,15 @@ namespace FAST_VARIANT
     ReluTaskParams layer6params{16, layer_6_output, layer_5_output, taskHandleArray};
     GemmTaskParams layer7params{15, 16, layer_7_output, layer_6_output, layer_7_bias, &layer_7_weight[0][0], taskHandleArray};
     LogSoftmaxTaskParams layer8params{15, layer_8_output, layer_7_output, pred, taskHandleArray, mutex};
-    
-    xTaskCreate(GemmTask, "Layer1", 2048, &layer1params, 1, &taskHandleArray[0]);
-    xTaskCreate(BatchNormalizationTask, "Layer2", 4096, &layer2params, 1, &taskHandleArray[1]);
-    xTaskCreate(ReluTask, "Layer3", 2048, &layer3params, 1, &taskHandleArray[2]);
-    xTaskCreate(GemmTask, "Layer4", 2048, &layer4params, 1, &taskHandleArray[3]);
-    xTaskCreate(BatchNormalizationTask, "Layer5", 4096, &layer5params, 1, &taskHandleArray[4]);
-    xTaskCreate(ReluTask, "Layer6", 2048, &layer6params, 1, &taskHandleArray[5]);
-    xTaskCreate(GemmTask, "Layer7", 2048, &layer7params, 1, &taskHandleArray[6]);
-    xTaskCreate(LogSoftmaxTask, "Layer8", 2048, &layer8params, 1, &taskHandleArray[7]);
+
+    xTaskCreate(GemmTask_Variant, "Layer1_Variant", 1500, &layer1params, 1, &taskHandleArray[0]);
+    xTaskCreate(BatchNormalizationTask_Variant, "Layer2_Variant", 1500, &layer2params, 1, &taskHandleArray[1]);
+    xTaskCreate(ReluTask, "Layer3_Variant", 1500, &layer3params, 1, &taskHandleArray[2]);
+    xTaskCreate(GemmTask_Variant, "Layer4_Variant", 1500, &layer4params, 1, &taskHandleArray[3]);
+    xTaskCreate(BatchNormalizationTask_Variant, "Layer5_Variant", 1500, &layer5params, 1, &taskHandleArray[4]);
+    xTaskCreate(ReluTask, "Layer6_Variant", 1500, &layer6params, 1, &taskHandleArray[5]);
+    xTaskCreate(GemmTask_Variant, "Layer7_Variant", 1500, &layer7params, 1, &taskHandleArray[6]);
+    xTaskCreate(LogSoftmaxTask, "Layer8_Variant", 1500, &layer8params, 1, &taskHandleArray[7]);
     xSemaphoreTake(mutex, portMAX_DELAY);
 
     vSemaphoreDelete(mutex);

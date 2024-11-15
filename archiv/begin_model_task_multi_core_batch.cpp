@@ -211,10 +211,10 @@ namespace FAST_INFERENCE
     LogSoftmaxTaskParams layer8params{15, layer_8_output, layer_7_output, pred, taskHandleArray, mutex};
     
     xTaskCreate(GemmTask, "Layer1", 2048, &layer1params, 1, &taskHandleArray[0]);
-    xTaskCreate(BatchNormalizationTask, "Layer2", 4096, &layer2params, 1, &taskHandleArray[1]);
+    xTaskCreate(BatchNormalizationTask, "Layer2", 2048, &layer2params, 1, &taskHandleArray[1]);
     xTaskCreate(ReluTask, "Layer3", 2048, &layer3params, 1, &taskHandleArray[2]);
     xTaskCreate(GemmTask, "Layer4", 2048, &layer4params, 1, &taskHandleArray[3]);
-    xTaskCreate(BatchNormalizationTask, "Layer5", 4096, &layer5params, 1, &taskHandleArray[4]);
+    xTaskCreate(BatchNormalizationTask, "Layer5", 2048, &layer5params, 1, &taskHandleArray[4]);
     xTaskCreate(ReluTask, "Layer6", 2048, &layer6params, 1, &taskHandleArray[5]);
     xTaskCreate(GemmTask, "Layer7", 2048, &layer7params, 1, &taskHandleArray[6]);
     xTaskCreate(LogSoftmaxTask, "Layer8", 2048, &layer8params, 1, &taskHandleArray[7]);
